@@ -10,23 +10,17 @@ public class Goal {
 
     private String name;
 
-    private int stepGoal;
+    private int goalMax;
 
-    private int stepsCompleted;
+    private int goalDone;
+
+    private String goalUnits;
 
     private boolean currentGoal;
 
     private Date dateCreated;
 
     private Date dateSet;
-
-    public Goal(String name, int stepGoal){
-        this.name = name;
-        this.stepGoal = stepGoal;
-        this.stepsCompleted = 0;
-        this.dateCreated = new Date(System.currentTimeMillis());
-        this.currentGoal = false;
-    }
 
     public String getName() {
         return name;
@@ -36,20 +30,20 @@ public class Goal {
         this.name = name;
     }
 
-    public int getStepsCompleted() {
-        return stepsCompleted;
+    public int getGoalMax() {
+        return goalMax;
     }
 
-    public void setStepsCompleted(int stepsCompleted) {
-        this.stepsCompleted = stepsCompleted;
+    public void setGoalMax(int goalMax) {
+        this.goalMax = goalMax;
     }
 
-    public int getStepGoal() {
-        return stepGoal;
+    public int getGoalDone() {
+        return goalDone;
     }
 
-    public void setStepGoal(int stepGoal) {
-        this.stepGoal = stepGoal;
+    public void setGoalDone(int goalDone) {
+        this.goalDone = goalDone;
     }
 
     public boolean isCurrentGoal() {
@@ -60,12 +54,12 @@ public class Goal {
         this.currentGoal = currentGoal;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public String getGoalUnits() {
+        return goalUnits;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setGoalUnits(String goalUnits) {
+        this.goalUnits = goalUnits;
     }
 
     public Date getDateSet() {
@@ -75,4 +69,22 @@ public class Goal {
     public void setDateSet(Date dateSet) {
         this.dateSet = dateSet;
     }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Goal(String name, int goalMax, String goalUnits) {
+        this.name = name;
+        this.goalMax = goalMax;
+        this.goalDone = 0;
+        this.goalUnits = goalUnits;
+        this.dateCreated = new Date(System.currentTimeMillis());
+        this.currentGoal = false;
+    }
+
 }

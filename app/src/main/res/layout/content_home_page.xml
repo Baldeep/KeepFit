@@ -80,11 +80,21 @@
 
                         </LinearLayout>
 
-                        <ProgressBar
-                            style="?android:attr/progressBarStyleLarge"
+                        <com.eralp.circleprogressview.CircleProgressView
+                            android:id="@+id/circle_progress_view"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/progressBar" />
+                            android:layout_weight="1"
+                            android:layout_height="200dp"
+                            android:layout_gravity="center"
+                            app:cpv_circle_color="#27375c"
+                            app:cpv_circle_width="6dp"
+                            app:cpv_background_circle_width="1dp"
+                            app:cpv_background_circle_color="#5b253048"
+                            app:cpv_text_prefix=""
+                            app:cpv_text_size="20"
+                            app:cpv_text_color="#27375c" />
+
+
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -97,7 +107,7 @@
                                 android:textSize="15sp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/currentGoalStepsTaken"/>
+                                android:id="@+id/progressDone"/>
 
                             <TextView
                                 android:text="/"
@@ -110,14 +120,20 @@
                                 android:textSize="15sp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/currentGoalSteps"/>
+                                android:id="@+id/progressMax"/>
 
                             <TextView
-                                android:text=" Steps"
+                                android:text=" "
+                                android:textSize="15sp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:text="Steps"
                                 android:textSize="15sp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/currentGoalUnits"/>
+                                android:id="@+id/progressUnits"/>
 
                         </LinearLayout>
 
@@ -127,18 +143,28 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/tab2"
+                        android:id="@+id/tabhistory"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="History Tab"/>
 
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/tab3"
+                        android:id="@+id/tabstats"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Stats Tab"/>
 
                     </LinearLayout>
                 </FrameLayout>
