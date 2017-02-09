@@ -59,13 +59,16 @@
                                 <TextView
                                     android:text="@string/your_daily_goal_heading"
                                     android:textSize="15sp"
+                                    android:textColor="@android:color/black"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:id="@+id/dailyGoalHeading"/>
 
                                 <TextView
                                     android:text="Goal Name"
-                                    android:textSize="25sp"
+                                    android:textSize="30sp"
+                                    android:layout_marginTop="2dp"
+                                    android:textColor="@android:color/black"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:id="@+id/currentGoalName" />
@@ -76,6 +79,7 @@
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_marginTop="5dp"
                                 android:id="@+id/currentGoalMetIcon"/>
 
                         </LinearLayout>
@@ -84,8 +88,9 @@
                             android:id="@+id/circle_progress_view"
                             android:layout_width="match_parent"
                             android:layout_weight="1"
-                            android:layout_height="200dp"
+                            android:layout_height="120dp"
                             android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
                             app:cpv_circle_color="#27375c"
                             app:cpv_circle_width="6dp"
                             app:cpv_background_circle_width="1dp"
@@ -100,7 +105,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="horizontal"
-                            android:gravity="right">
+                            android:gravity="right"
+                            android:visibility="gone">
 
                             <TextView
                                 android:text="0"
@@ -138,8 +144,27 @@
                         </LinearLayout>
 
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/black"
+                                android:textSize="15sp"
+                                android:text="@string/your_goals_heading"/>
 
+                        </LinearLayout>
+
+                        <ListView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="7dp"
+                            android:id="@+id/listview_goals">
+
+                        </ListView>
                     </LinearLayout>
 
                     <LinearLayout
@@ -151,7 +176,15 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="History Tab"/>
+                            android:text="Your past activity:"/>
+
+                        <ListView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="7dp"
+                            android:id="@+id/listview_activityhistory">
+
+                        </ListView>
 
                     </LinearLayout>
 
