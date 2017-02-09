@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:text="Goal Name"
+        android:textSize="20dp"
         android:ems="10"
         android:id="@+id/txt_goalname" />
 
@@ -28,14 +29,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.7"
             android:inputType="numberDecimal"
+            android:text="10000"
+            android:textSize="20dp"
             android:ems="10"
-            android:id="@+id/editText" />
+            android:id="@+id/txt_goalmax" />
 
         <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="2"
-            android:id="@+id/spinner" />
+            android:id="@+id/spinner_goalunits" />
 
     </LinearLayout>
     <LinearLayout
@@ -44,16 +47,19 @@
         android:orientation="horizontal">
 
         <TextView
-            android:text="TextView"
+            android:text="Set as today's goal?"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView2"
-            android:layout_weight="0.7" />
+            android:layout_weight="0.3" />
+
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/checkBox"
+            android:id="@+id/checkbox_setcurrent"
             android:layout_weight="0.7" />
 
 

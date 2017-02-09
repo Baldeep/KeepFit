@@ -1,8 +1,10 @@
 package cs551.baldeep.keepfit;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +22,7 @@ import com.eralp.circleprogressview.CircleProgressView;
 
 import java.util.List;
 
+import cs551.baldeep.constants.BundleConstants;
 import cs551.baldeep.models.Goal;
 
 public class HomePage extends AppCompatActivity
@@ -28,40 +31,25 @@ public class HomePage extends AppCompatActivity
     private Goal currentGoal;
     private List<Goal> goalList;
 
+    private TextView dailyGoalName;
+    private CircleProgressView mCircleProgressView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
-        setUpTabs();
-
-        TextView dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
-        if(currentGoal != null){
-            dailyGoalName.setText(currentGoal.getName());
-        } else {
-            dailyGoalName.setText(R.string.no_goal_message);
-        }
-
-        currentGoal = new Goal("New Goal", 10000, "Steps");
-        currentGoal.setGoalDone(5000);
-
-        // ProgressBar
-        CircleProgressView mCircleProgressView =
-                                (CircleProgressView) findViewById(R.id.circle_progress_view);
+        dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
+        mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
         mCircleProgressView.setTextEnabled(true);
         mCircleProgressView.setInterpolator(new AccelerateDecelerateInterpolator());
         mCircleProgressView.setStartAngle(270);
         mCircleProgressView.setUsePercentage(false);
 
-        if(currentGoal != null){
-            double progress = ((double) currentGoal.getGoalDone()/(double)currentGoal.getGoalMax())*100;
-            mCircleProgressView.setProgressWithAnimation((int) progress, 2000);
-            mCircleProgressView.setTextString(currentGoal.getGoalDone()+"");
-            mCircleProgressView.setTextSuffix("/" + currentGoal.getGoalMax()
-                                                    + "\n" + currentGoal.getGoalUnits());
-        } else {
-            mCircleProgressView.setTextSuffix("/0 Steps");
-        }
+
+        setUpTabs();
+        updateUI();
 
 
         TextView progressDone = (TextView) findViewById(R.id.progressDone);
@@ -82,12 +70,13 @@ public class HomePage extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Action Button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_addgoal);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent addGoalScreen = new Intent(view.getContext(),  AddGoal.class);
+                final int result = 1;
+                startActivityForResult(addGoalScreen, result);
             }
         });
 
@@ -100,6 +89,28 @@ public class HomePage extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        TextView currentGoalName = (TextView) findViewById(R.id.currentGoalName);
+
+        String goalName = data.getStringExtra(BundleConstants.goalName);
+        int goalValue = data.getIntExtra(BundleConstants.goalValue, 0);
+        String goalUnits = data.getStringExtra(BundleConstants.goalUnits);
+
+        currentGoal = new Goal(goalName, goalValue, goalUnits);
+        if(currentGoal == null){
+            Log.d("Home", "Current goal is null after creating it");
+        } else {
+            Log.d("Home", "Current goal has been created successfully.");
+        }
+
+
+        updateUI();
+    }
+
 
     private void setUpTabs(){
         // Tabs
@@ -180,5 +191,30 @@ public class HomePage extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void updateUI(){
+
+        if(currentGoal != null)
+            Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalMax() + " " + currentGoal.getGoalUnits());
+
+        // Goal name heading
+        if(currentGoal != null){
+            dailyGoalName.setText(currentGoal.getName());
+        } else {
+            dailyGoalName.setText(R.string.no_goal_message);
+        }
+
+        // ProgressBar
+        if(currentGoal != null){
+            double progress =
+                    ((double) currentGoal.getGoalDone()/(double)currentGoal.getGoalMax())*100;
+            mCircleProgressView.setProgressWithAnimation((int) progress, 2000);
+            mCircleProgressView.setTextString(currentGoal.getGoalDone()+"");
+            mCircleProgressView.setTextSuffix("/" + currentGoal.getGoalMax()
+                    + "\n" + currentGoal.getGoalUnits());
+        } else {
+            mCircleProgressView.setTextSuffix("/0 Steps");
+        }
     }
 }
