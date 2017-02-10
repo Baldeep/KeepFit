@@ -214,7 +214,27 @@ public class HomePage extends AppCompatActivity
             mCircleProgressView.setTextSuffix("/" + currentGoal.getGoalMax()
                     + "\n" + currentGoal.getGoalUnits());
         } else {
-            mCircleProgressView.setTextSuffix("/0 Steps");
+            mCircleProgressView.setTextSuffix("\t");
+            mCircleProgressView.setTextString("0");
+            mCircleProgressView.setTextSuffix("/0\nSteps");
         }
     }
+/*
+    private String getProgressBarString(){
+        String s = "";
+        if(currentGoal == null){
+            return "0/0 Steps";
+        } else {
+            if(currentGoal.getGoalUnits() == "Steps"){
+                if(currentGoal.getGoalMax() % 1000 == 0){
+                    s = currentGoal.getGoalDone() + "/" + (currentGoal.getGoalMax()/1000) + "k";
+                } else {
+                    s = currentGoal.getGoalDone() + "/" + currentGoal.getGoalMax();
+                    for(i = 0; i < )
+                }
+            }
+        }
+
+        return s;
+    }*/
 }

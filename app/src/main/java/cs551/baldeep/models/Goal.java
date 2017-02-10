@@ -1,12 +1,15 @@
 package cs551.baldeep.models;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by Baldeep on 06/02/2017.
  */
 
 public class Goal {
+
+    private String goalUUID;
 
     private String name;
 
@@ -78,7 +81,16 @@ public class Goal {
         this.dateCreated = dateCreated;
     }
 
+    public String getGoalUUID() {
+        return goalUUID;
+    }
+
+    public void setGoalUUID(String goalUUID) {
+        this.goalUUID = goalUUID;
+    }
+
     public Goal(String name, int goalMax, String goalUnits) {
+        this.goalUUID = UUID.randomUUID().toString();
         this.name = name;
         this.goalMax = goalMax;
         this.goalDone = 0;
