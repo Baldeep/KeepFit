@@ -21,7 +21,6 @@ import cs551.baldeep.models.Goal;
  */
 
 public class DBHelper extends OrmLiteSqliteOpenHelper {
-
     public static final String DATABASE_NAME = "KeepFit.db";
     public static final int DATABASE_VERSION = 1;
 
@@ -29,8 +28,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Activity, String> activityDAO;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null,
-                DATABASE_VERSION, R.raw.ormlite_config);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
 

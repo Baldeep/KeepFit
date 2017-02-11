@@ -3,7 +3,6 @@ package cs551.baldeep.keepfit;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -15,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -80,6 +81,17 @@ public class HomePage extends AppCompatActivity
             }
         });
 
+        // Goals List View
+        String[] goalNames = new String[goalList.size()];
+        for(int i = 0; i < goalList.size(); i++){
+            goalNames[i] = goalList.get(i).getName();
+        }
+        ListAdapter theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                goalNames);
+
+
+
+        // Hamburger menu
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
             this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
