@@ -8,4 +8,5 @@
     <string name="your_daily_goal_heading">Your Daily Goal:</string>
     <string name="no_goal_message">No goal set for today!</string>
     <string name="your_goals_heading">Your Goals:</string>
+    <string name="no_goals_have_been_created_yet">No goals have been created yet!</string>
 </resources>

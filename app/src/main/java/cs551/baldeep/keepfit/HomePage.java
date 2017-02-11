@@ -13,14 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import cs551.baldeep.constants.BundleConstants;
@@ -34,12 +39,21 @@ public class HomePage extends AppCompatActivity
 
     private TextView dailyGoalName;
     private CircleProgressView mCircleProgressView;
+    private ListView listOfGoals;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
+        // TODO: get this list from the db
+        goalList = new ArrayList<Goal>();
+        for(int i = 0; i < 10; i++) {
+            goalList.add(new Goal("Goal " + i, i * 100, "Steps"));
+        }
+
+        setUpTabs();
 
         dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
         mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
@@ -48,10 +62,7 @@ public class HomePage extends AppCompatActivity
         mCircleProgressView.setStartAngle(270);
         mCircleProgressView.setUsePercentage(false);
 
-
-        setUpTabs();
         updateUI();
-
 
         TextView progressDone = (TextView) findViewById(R.id.progressDone);
         TextView progressMax = (TextView) findViewById(R.id.progressMax);
@@ -65,6 +76,26 @@ public class HomePage extends AppCompatActivity
             progressMax.setText("0");
             progressUnits.setText("Steps");
         }
+
+        // Goals List View
+        if(goalList.size()>0){
+            TextView listReplacementText = (TextView) findViewById(R.id.txt_no_goals_list_replacement);
+            listReplacementText.setVisibility(View.GONE);
+        }
+        String[] goalNames = new String[goalList.size()];
+        for(int i = 0; i < goalList.size(); i++){
+            goalNames[i] = goalList.get(i).getName();
+        }
+
+
+        listOfGoals = (ListView) findViewById(R.id.listview_goals);
+
+        //ListAdapter theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, goalNames);
+        //listOfGoals.setAdapter(theAdapter);
+        ListAdapter listViewAdapter = new GoalListAdapter(this, goalList);
+        listOfGoals.setAdapter(listViewAdapter);
+        setListViewHeightBasedOnItems(listOfGoals);
+
 
         // ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -80,14 +111,6 @@ public class HomePage extends AppCompatActivity
                 startActivityForResult(addGoalScreen, result);
             }
         });
-
-        // Goals List View
-        String[] goalNames = new String[goalList.size()];
-        for(int i = 0; i < goalList.size(); i++){
-            goalNames[i] = goalList.get(i).getName();
-        }
-        ListAdapter theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                goalNames);
 
 
 
@@ -113,6 +136,7 @@ public class HomePage extends AppCompatActivity
         String goalUnits = data.getStringExtra(BundleConstants.goalUnits);
 
         currentGoal = new Goal(goalName, goalValue, goalUnits);
+        currentGoal.setGoalDone(6000);
         if(currentGoal == null){
             Log.d("Home", "Current goal is null after creating it");
         } else {
@@ -230,6 +254,43 @@ public class HomePage extends AppCompatActivity
             mCircleProgressView.setTextString("0");
             mCircleProgressView.setTextSuffix("/0\nSteps");
         }
+    }
+
+    /*
+     * From:
+     * http://stackoverflow.com/questions/1778485/android-listview-display-all-available-items-without-scroll-with-static-header
+     */
+    public static boolean setListViewHeightBasedOnItems(ListView listView) {
+
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter != null) {
+
+            int numberOfItems = listAdapter.getCount();
+
+            // Get total height of all items.
+            int totalItemsHeight = 0;
+            for (int itemPos = 0; itemPos < numberOfItems; itemPos++) {
+                View item = listAdapter.getView(itemPos, null, listView);
+                item.measure(0, 0);
+                totalItemsHeight += item.getMeasuredHeight();
+            }
+
+            // Get total height of all item dividers.
+            int totalDividersHeight = listView.getDividerHeight() *
+                    (numberOfItems - 1);
+
+            // Set list height.
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            params.height = totalItemsHeight + totalDividersHeight;
+            listView.setLayoutParams(params);
+            listView.requestLayout();
+
+            return true;
+
+        } else {
+            return false;
+        }
+
     }
 /*
     private String getProgressBarString(){
