@@ -1,4 +1,4 @@
-package cs551.baldeep.keepfit;
+package cs551.baldeep.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import cs551.baldeep.keepfit.R;
 import cs551.baldeep.models.Goal;
 
 /**
@@ -18,8 +19,12 @@ import cs551.baldeep.models.Goal;
 
 public class GoalListAdapter extends ArrayAdapter<Goal> {
 
+    private List<Goal> goals;
+
     public GoalListAdapter(Context context, List<Goal> goals) {
         super(context, R.layout.goal_list_row_layout, goals);
+
+        this.goals = goals;
     }
 
     @NonNull
@@ -37,5 +42,9 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
 
         return goalRow;
+    }
+
+    public void setData(List<Goal> goals){
+        this.goals = goals;
     }
 }

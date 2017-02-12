@@ -13,30 +13,39 @@ import java.util.UUID;
 @DatabaseTable(tableName = "goal")
 public class Goal {
 
+    public static String GOALUUID = "pk_goal_id";
     @DatabaseField(id = true, columnName = "pk_goal_id")
     private String goalUUID;
 
+    public static String GOAL_NAME = "name";
     @DatabaseField(columnName = "name")
     private String name;
 
+    public static String GOAL_VALUE = "goal_value";
     @DatabaseField(columnName = "goal_value")
     private double goalValue;
 
+    public static String GOAL_COMPLETED = "goal_completed_value";
     @DatabaseField(columnName = "goal_completed_value")
     private double goalCompleted;
 
+    public static String PERCENTAGE_COMPLETED = "goal_completed_percentage";
     @DatabaseField(columnName = "goal_completed_percentage")
     private int percentageCompleted;
 
+    public static String GOAL_UNITS = "goal_units";
     @DatabaseField(columnName = "goal_units")
     private String goalUnits;
 
+    public static String CURRENT_GOAL = "goal_is_curent";
     @DatabaseField(columnName = "goal_is_curent")
     private boolean currentGoal;
 
+    public static String GOAL_DATE = "goal_date";
     @DatabaseField(columnName = "goal_date")
     private Date dateOfGoal;
 
+    public static String GOAL_DONE = "goal_done";
     @DatabaseField(columnName = "goal_done")
     private boolean done;
 

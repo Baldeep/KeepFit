@@ -17,22 +17,17 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
-import org.w3c.dom.Text;
-
-import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.constants.BundleConstants;
-import cs551.baldeep.dao.DBHelper;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
 
@@ -47,7 +42,6 @@ public class HomePage extends AppCompatActivity
     private TextView progressText;
 
     private ListView listOfGoals;
-    private ListAdapter goalListAdapter;
 
     private GoalDAO goalDAO;
 
@@ -64,6 +58,7 @@ public class HomePage extends AppCompatActivity
         }
 
         goalList = goalDAO.findAll();
+        currentGoal = goalDAO.findCurrentGoal();
 
         setUpTabs();
 
@@ -80,8 +75,6 @@ public class HomePage extends AppCompatActivity
         }
 
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
-        goalListAdapter = new GoalListAdapter(this, goalList);
-        listOfGoals.setAdapter(goalListAdapter);
         listOfGoals.setFocusable(false);
 
 
@@ -138,18 +131,17 @@ public class HomePage extends AppCompatActivity
             Goal newGoal = new Goal(goalName, goalValue, goalUnits);
 
             if(!goalDAO.saveOrUpdate(newGoal)){
-                Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT).show();
             }
 
             if(currentGoal == null){
                 currentGoal = newGoal;
-                Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT).show();
             }
 
             updateUI();
         }
     }
-
 
     private void setUpTabs(){
         // Tabs
@@ -262,7 +254,10 @@ public class HomePage extends AppCompatActivity
         }
 
         // ListView HomePage
-        goalListAdapter.notifyDataSetChanged();
+        goalList = goalDAO.findAll();
+        ListAdapter goalListAdapter = new GoalListAdapter(this, goalList);
+        listOfGoals.setAdapter(goalListAdapter);
+        setListViewHeightBasedOnItems(listOfGoals);
     }
 
     /*

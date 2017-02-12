@@ -1,4 +1,4 @@
-package cs551.baldeep.keepfit;
+package cs551.baldeep.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -13,6 +13,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
+import cs551.baldeep.keepfit.R;
 import cs551.baldeep.models.Goal;
 
 /**
