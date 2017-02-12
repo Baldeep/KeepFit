@@ -19,8 +19,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AddGoal"
+        <activity android:name=".AddGoalPage"
             android:label="Add Goal"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".SettingsPage"
+            android:label="Settings"
             android:theme="@style/AppTheme"/>
 
     </application>

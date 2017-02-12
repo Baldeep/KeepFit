@@ -1,7 +1,10 @@
 package cs551.baldeep.keepfit;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
@@ -31,9 +34,10 @@ import cs551.baldeep.constants.BundleConstants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
 
-public class HomePage extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class HomePage extends AppCompatActivity {
 
+    private static final int ADD_GOAL_RESULT = 1;
+    private static final int SETTINGS_RESULT = 2;
     private Goal currentGoal;
     private List<Goal> goalList;
 
@@ -95,9 +99,9 @@ public class HomePage extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addGoalScreen = new Intent(view.getContext(),  AddGoal.class);
-                final int result = 1;
-                startActivityForResult(addGoalScreen, result);
+                Intent addGoalScreen = new Intent(view.getContext(),  AddGoalPage.class);
+
+                startActivityForResult(addGoalScreen, ADD_GOAL_RESULT);
             }
         });
 
@@ -110,7 +114,21 @@ public class HomePage extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if(item.getItemId() == R.id.nav_settings){
+                    Log.d("Nav Menu", "Pressed settings ****************************");
+                    FragmentManager mFragmentManager = getFragmentManager();
+                    FragmentTransaction mFragmentTransaction = mFragmentManager
+                            .beginTransaction();
+                    SettingsPageFrag mPrefsFragment = new SettingsPageFrag();
+                    mFragmentTransaction.replace(android.R.id.content, mPrefsFragment);
+                    mFragmentTransaction.commit();
+                }
+                return true;
+            }
+        });
 
         updateUI();
 
@@ -121,7 +139,7 @@ public class HomePage extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         Log.i("HomePage.OnResult", "requestCode: " + requestCode + ", resultCode: " + resultCode);
-        if(resultCode == 1){
+        if(resultCode == ADD_GOAL_RESULT){
             String goalName = data.getStringExtra(BundleConstants.goalName);
             int goalValue = data.getIntExtra(BundleConstants.goalValue, 0);
             String goalUnits = data.getStringExtra(BundleConstants.goalUnits);
@@ -199,15 +217,15 @@ public class HomePage extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    /*@SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        /*if (id == R.id.nav_camera) {
+        *//*if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else */if (id == R.id.nav_gallery) {
+        } else *//*if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -222,7 +240,7 @@ public class HomePage extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
+    }*/
 
     private void updateUI(){
 

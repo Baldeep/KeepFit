@@ -20,7 +20,7 @@ import cs551.baldeep.utils.Units;
  * Created by balde on 09/02/2017.
  */
 
-public class AddGoal extends AppCompatActivity {
+public class AddGoalPage extends AppCompatActivity {
 
     protected Spinner spinner;
 
