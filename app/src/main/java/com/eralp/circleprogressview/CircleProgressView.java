@@ -125,10 +125,10 @@ public class CircleProgressView extends View {
         mCircleColor = Color.BLACK;
         mTextColor = Color.BLACK;
         mBackgroundColor = Color.GRAY;
-        mStartAngle = -90;
+        mStartAngle = 0;
         mIsTextEnabled = true;
         mTextSize = 20;
-        usePercentage = true;
+        usePercentage = false;
     }
 
     @Override

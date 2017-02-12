@@ -34,7 +34,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
 
         goalName.setText(getItem(position).getName());
 
-        goalMax.setText(getItem(position).getGoalMax() + " " + getItem(position).getGoalUnits());
+        goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
 
         return goalRow;
     }

@@ -13,7 +13,6 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 
 import cs551.baldeep.keepfit.R;
-import cs551.baldeep.models.Activity;
 import cs551.baldeep.models.Goal;
 
 /**
@@ -25,11 +24,9 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     public static final int DATABASE_VERSION = 1;
 
     private Dao<Goal, String> goalDAO;
-    private Dao<Activity, String> activityDAO;
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
+        super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
     }
 
 
@@ -37,7 +34,6 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try{
             TableUtils.createTable(connectionSource, Goal.class);
-            TableUtils.createTable(connectionSource, Activity.class);
         } catch (SQLException e) {
             Log.e("DBHelper", "Failed to initialise tables. " + e.toString());
         }
@@ -47,7 +43,6 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
             TableUtils.dropTable(connectionSource, Goal.class, false);
-            TableUtils.dropTable(connectionSource, Activity.class, false);
             onCreate(database, connectionSource);
 
         } catch (SQLException e) {
@@ -62,12 +57,6 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         return goalDAO;
     }
 
-    public Dao<Activity, String> getActivityDAO() throws SQLException{
-        if(activityDAO == null){
-            activityDAO = getDao(Activity.class);
-        }
-        return activityDAO;
-    }
 
    /* public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, null, 1);

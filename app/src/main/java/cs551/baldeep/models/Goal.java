@@ -1,5 +1,8 @@
 package cs551.baldeep.models;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -7,78 +10,47 @@ import java.util.UUID;
  * Created by Baldeep on 06/02/2017.
  */
 
+@DatabaseTable(tableName = "goal")
 public class Goal {
 
+    @DatabaseField(id = true, columnName = "pk_goal_id")
     private String goalUUID;
 
+    @DatabaseField(columnName = "name")
     private String name;
 
-    private int goalMax;
+    @DatabaseField(columnName = "goal_value")
+    private double goalValue;
 
-    private int goalDone;
+    @DatabaseField(columnName = "goal_completed_value")
+    private double goalCompleted;
 
+    @DatabaseField(columnName = "goal_completed_percentage")
+    private int percentageCompleted;
+
+    @DatabaseField(columnName = "goal_units")
     private String goalUnits;
 
+    @DatabaseField(columnName = "goal_is_curent")
     private boolean currentGoal;
 
-    private Date dateCreated;
+    @DatabaseField(columnName = "goal_date")
+    private Date dateOfGoal;
 
-    private Date dateSet;
+    @DatabaseField(columnName = "goal_done")
+    private boolean done;
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
+    public Goal(String name, int goalValue, String goalUnits) {
+        this.goalUUID = UUID.randomUUID().toString();
         this.name = name;
-    }
-
-    public int getGoalMax() {
-        return goalMax;
-    }
-
-    public void setGoalMax(int goalMax) {
-        this.goalMax = goalMax;
-    }
-
-    public int getGoalDone() {
-        return goalDone;
-    }
-
-    public void setGoalDone(int goalDone) {
-        this.goalDone = goalDone;
-    }
-
-    public boolean isCurrentGoal() {
-        return currentGoal;
-    }
-
-    public void setCurrentGoal(boolean currentGoal) {
-        this.currentGoal = currentGoal;
-    }
-
-    public String getGoalUnits() {
-        return goalUnits;
-    }
-
-    public void setGoalUnits(String goalUnits) {
+        this.goalValue = goalValue;
+        this.goalCompleted = 0;
         this.goalUnits = goalUnits;
+        this.currentGoal = false;
     }
 
-    public Date getDateSet() {
-        return dateSet;
-    }
-
-    public void setDateSet(Date dateSet) {
-        this.dateSet = dateSet;
-    }
-
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public Goal() {
     }
 
     public String getGoalUUID() {
@@ -89,14 +61,68 @@ public class Goal {
         this.goalUUID = goalUUID;
     }
 
-    public Goal(String name, int goalMax, String goalUnits) {
-        this.goalUUID = UUID.randomUUID().toString();
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
-        this.goalMax = goalMax;
-        this.goalDone = 0;
+    }
+
+    public double getGoalValue() {
+        return goalValue;
+    }
+
+    public void setGoalValue(double goalValue) {
+        this.goalValue = goalValue;
+    }
+
+    public double getGoalCompleted() {
+        return goalCompleted;
+    }
+
+    public void setGoalCompleted(double goalCompleted) {
+        this.goalCompleted = goalCompleted;
+    }
+
+    public String getGoalUnits() {
+        return goalUnits;
+    }
+
+    public void setGoalUnits(String goalUnits) {
         this.goalUnits = goalUnits;
-        this.dateCreated = new Date(System.currentTimeMillis());
-        this.currentGoal = false;
+    }
+
+    public boolean isCurrentGoal() {
+        return currentGoal;
+    }
+
+    public void setCurrentGoal(boolean currentGoal) {
+        this.currentGoal = currentGoal;
+    }
+
+    public Date getDateOfGoal() {
+        return dateOfGoal;
+    }
+
+    public void setDateOfGoal(Date dateOfGoal) {
+        this.dateOfGoal = dateOfGoal;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
+    public int getPercentageCompleted() {
+        return percentageCompleted;
+    }
+
+    public void setPercentageCompleted(int percentageCompleted) {
+        this.percentageCompleted = percentageCompleted;
     }
 
 }

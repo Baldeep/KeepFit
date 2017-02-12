@@ -15,20 +15,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
 import org.w3c.dom.Text;
 
+import java.sql.Date;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import cs551.baldeep.constants.BundleConstants;
+import cs551.baldeep.dao.DBHelper;
+import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
 
 public class HomePage extends AppCompatActivity
@@ -39,63 +44,54 @@ public class HomePage extends AppCompatActivity
 
     private TextView dailyGoalName;
     private CircleProgressView mCircleProgressView;
-    private ListView listOfGoals;
+    private TextView progressText;
 
+    private ListView listOfGoals;
+    private ListAdapter goalListAdapter;
+
+    private GoalDAO goalDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-
-        // TODO: get this list from the db
-        goalList = new ArrayList<Goal>();
-        for(int i = 0; i < 10; i++) {
-            goalList.add(new Goal("Goal " + i, i * 100, "Steps"));
+        try {
+            goalDAO = new GoalDAO(getApplicationContext());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Thread.UncaughtExceptionHandler ueh = Thread.getDefaultUncaughtExceptionHandler();
+            ueh.uncaughtException(Thread.currentThread(), e);
         }
+
+        goalList = goalDAO.findAll();
 
         setUpTabs();
 
         dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
         mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
-        mCircleProgressView.setTextEnabled(true);
         mCircleProgressView.setInterpolator(new AccelerateDecelerateInterpolator());
-        mCircleProgressView.setStartAngle(270);
-        mCircleProgressView.setUsePercentage(false);
+        progressText = (TextView) findViewById(R.id.txt_goalprogress);
 
-        updateUI();
-
-        TextView progressDone = (TextView) findViewById(R.id.progressDone);
-        TextView progressMax = (TextView) findViewById(R.id.progressMax);
-        TextView progressUnits = (TextView) findViewById(R.id.progressUnits);
-        if(currentGoal != null){
-            progressDone.setText(currentGoal.getGoalDone() + "");
-            progressMax.setText(currentGoal.getGoalMax() + "");
-            progressUnits.setText(currentGoal.getGoalUnits() + "");
-        } else {
-            progressDone.setText("0");
-            progressMax.setText("0");
-            progressUnits.setText("Steps");
-        }
 
         // Goals List View
         if(goalList.size()>0){
             TextView listReplacementText = (TextView) findViewById(R.id.txt_no_goals_list_replacement);
             listReplacementText.setVisibility(View.GONE);
         }
-        String[] goalNames = new String[goalList.size()];
-        for(int i = 0; i < goalList.size(); i++){
-            goalNames[i] = goalList.get(i).getName();
-        }
-
 
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
+        goalListAdapter = new GoalListAdapter(this, goalList);
+        listOfGoals.setAdapter(goalListAdapter);
+        listOfGoals.setFocusable(false);
 
-        //ListAdapter theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, goalNames);
-        //listOfGoals.setAdapter(theAdapter);
-        ListAdapter listViewAdapter = new GoalListAdapter(this, goalList);
-        listOfGoals.setAdapter(listViewAdapter);
-        setListViewHeightBasedOnItems(listOfGoals);
 
+        // Clicking progressBar
+        mCircleProgressView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), "Clicked Progress circle", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -113,7 +109,6 @@ public class HomePage extends AppCompatActivity
         });
 
 
-
         // Hamburger menu
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -123,28 +118,36 @@ public class HomePage extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        updateUI();
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        TextView currentGoalName = (TextView) findViewById(R.id.currentGoalName);
+        Log.i("HomePage.OnResult", "requestCode: " + requestCode + ", resultCode: " + resultCode);
+        if(resultCode == 1){
+            String goalName = data.getStringExtra(BundleConstants.goalName);
+            int goalValue = data.getIntExtra(BundleConstants.goalValue, 0);
+            String goalUnits = data.getStringExtra(BundleConstants.goalUnits);
 
-        String goalName = data.getStringExtra(BundleConstants.goalName);
-        int goalValue = data.getIntExtra(BundleConstants.goalValue, 0);
-        String goalUnits = data.getStringExtra(BundleConstants.goalUnits);
+            Log.d("Return from Add", "goalval: " + goalValue);
 
-        currentGoal = new Goal(goalName, goalValue, goalUnits);
-        currentGoal.setGoalDone(6000);
-        if(currentGoal == null){
-            Log.d("Home", "Current goal is null after creating it");
-        } else {
-            Log.d("Home", "Current goal has been created successfully.");
+            Goal newGoal = new Goal(goalName, goalValue, goalUnits);
+
+            if(!goalDAO.saveOrUpdate(newGoal)){
+                Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT);
+            }
+
+            if(currentGoal == null){
+                currentGoal = newGoal;
+                Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT);
+            }
+
+            updateUI();
         }
-
-
-        updateUI();
     }
 
 
@@ -231,8 +234,10 @@ public class HomePage extends AppCompatActivity
 
     private void updateUI(){
 
-        if(currentGoal != null)
-            Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalMax() + " " + currentGoal.getGoalUnits());
+        if(currentGoal != null) {
+            Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalValue()
+                    + " " + currentGoal.getGoalUnits());
+        }
 
         // Goal name heading
         if(currentGoal != null){
@@ -243,17 +248,21 @@ public class HomePage extends AppCompatActivity
 
         // ProgressBar
         if(currentGoal != null){
-            double progress =
-                    ((double) currentGoal.getGoalDone()/(double)currentGoal.getGoalMax())*100;
-            mCircleProgressView.setProgressWithAnimation((int) progress, 2000);
-            mCircleProgressView.setTextString(currentGoal.getGoalDone()+"");
-            mCircleProgressView.setTextSuffix("/" + currentGoal.getGoalMax()
-                    + "\n" + currentGoal.getGoalUnits());
+            mCircleProgressView.setTextString("Add Activity");
         } else {
-            mCircleProgressView.setTextSuffix("\t");
-            mCircleProgressView.setTextString("0");
-            mCircleProgressView.setTextSuffix("/0\nSteps");
+            mCircleProgressView.setTextString("No goal");
         }
+
+        // Progress Text
+        if(currentGoal != null){
+            progressText.setText(currentGoal.getGoalCompleted()+"/"+currentGoal.getGoalValue()
+                    + " " + currentGoal.getGoalUnits());
+        } else {
+            progressText.setText("0/0 Steps");
+        }
+
+        // ListView HomePage
+        goalListAdapter.notifyDataSetChanged();
     }
 
     /*
@@ -292,22 +301,4 @@ public class HomePage extends AppCompatActivity
         }
 
     }
-/*
-    private String getProgressBarString(){
-        String s = "";
-        if(currentGoal == null){
-            return "0/0 Steps";
-        } else {
-            if(currentGoal.getGoalUnits() == "Steps"){
-                if(currentGoal.getGoalMax() % 1000 == 0){
-                    s = currentGoal.getGoalDone() + "/" + (currentGoal.getGoalMax()/1000) + "k";
-                } else {
-                    s = currentGoal.getGoalDone() + "/" + currentGoal.getGoalMax();
-                    for(i = 0; i < )
-                }
-            }
-        }
-
-        return s;
-    }*/
 }

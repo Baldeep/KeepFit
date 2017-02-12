@@ -40,11 +40,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+
+
                     <LinearLayout
                         android:id="@+id/tabhome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
+
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="9dp"
+                            android:progressTint="@color/colorPrimary"
+                            android:id="@+id/progressBar_history_steps"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_marginLeft="16dp" />
 
                         <ScrollView
                             android:layout_width="match_parent"
@@ -77,7 +89,7 @@
                                             android:id="@+id/dailyGoalHeading"/>
 
                                         <View
-                                            android:background="#aaaaaa"
+                                            android:background="@color/colorDivider"
                                             android:layout_width = "fill_parent"
                                             android:layout_height="1dp"
                                             android:layout_centerVertical ="true"
@@ -111,54 +123,29 @@
                                     android:layout_height="160dp"
                                     android:layout_gravity="center"
                                     android:layout_marginTop="10dp"
-                                    app:cpv_circle_color="@color/colorPrimary"
+                                    app:cpv_circle_color="@color/colorAccent"
                                     app:cpv_circle_width="9dp"
                                     app:cpv_background_circle_width="1dp"
                                     app:cpv_background_circle_color="#5b253048"
                                     app:cpv_text_prefix=""
                                     app:cpv_text_size="20"
-                                    app:cpv_text_color="@color/colorPrimary" />
+                                    app:cpv_text_color="@color/colorPrimary"/>
 
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:orientation="horizontal"
-                                    android:gravity="right"
-                                    android:visibility="gone">
+                                    android:gravity="center"
+                                    android:layout_marginTop="7dp">
 
                                     <TextView
-                                        android:text="0"
-                                        android:textSize="15sp"
+                                        android:text="0/0 Steps"
+                                        android:textSize="@dimen/text_row_title_size"
+                                        android:textColor="@color/colorPrimaryText"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:id="@+id/progressDone"/>
-
-                                    <TextView
-                                        android:text="/"
-                                        android:textSize="15sp"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"/>
-
-                                    <TextView
-                                        android:text="0"
-                                        android:textSize="15sp"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:id="@+id/progressMax"/>
-
-                                    <TextView
-                                        android:text=" "
-                                        android:textSize="15sp"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"/>
-
-                                    <TextView
-                                        android:text="Steps"
-                                        android:textSize="15sp"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:id="@+id/progressUnits"/>
+                                        android:id="@+id/txt_goalprogress"/>
 
                                 </LinearLayout>
 
@@ -178,7 +165,7 @@
                                 </LinearLayout>
 
                                 <View
-                                    android:background="#aaaaaa"
+                                    android:background="@color/colorDivider"
                                     android:layout_width = "fill_parent"
                                     android:layout_height="1dp"
                                     android:layout_centerVertical ="true"
@@ -197,11 +184,13 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="0dp"
                                     android:layout_marginTop="7dp"
+                                    android:layout_marginBottom="@dimen/activity_vertical_margin"
                                     android:id="@+id/listview_goals"
-                                    android:divider="#aaaaaa"
+                                    android:divider="@color/colorDivider"
                                     android:dividerHeight="1dp"
                                     android:footerDividersEnabled="true"
-                                    android:headerDividersEnabled="true">
+                                    android:headerDividersEnabled="true"
+                                    android:focusable="false">
 
                                 </ListView>
 
@@ -211,26 +200,41 @@
 
                     </LinearLayout>
 
+
                     <LinearLayout
                         android:id="@+id/tabhistory"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_marginLeft="@dimen/activity_vertical_margin"
+                        android:layout_marginRight="@dimen/activity_vertical_margin">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Your past activity:"/>
+                            android:text="Your past activity:"
+                            android:textColor="@color/colorPrimaryText"
+                            android:textSize="@dimen/text_sub_title_size"
+                            android:layout_marginTop="@dimen/activity_horizontal_margin"/>
+
+                        <View
+                            android:background="@color/colorDivider"
+                            android:layout_width = "fill_parent"
+                            android:layout_height="1dp"
+                            android:layout_centerVertical ="true"
+                            android:layout_alignParentTop="true"/>
 
                         <ListView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="0dp"
                             android:layout_marginTop="7dp"
-                            android:id="@+id/listview_activityhistory">
+                            android:id="@+id/listview_activityhistory"
+                            android:focusable="false">
 
                         </ListView>
 
                     </LinearLayout>
+
 
                     <LinearLayout
                         android:id="@+id/tabstats"

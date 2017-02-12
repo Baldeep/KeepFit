@@ -6,12 +6,15 @@ import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import cs551.baldeep.constants.BundleConstants;
+import cs551.baldeep.utils.Units;
 
 /**
  * Created by balde on 09/02/2017.
@@ -19,14 +22,20 @@ import cs551.baldeep.constants.BundleConstants;
 
 public class AddGoal extends AppCompatActivity {
 
+    protected Spinner spinner;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_goal);
 
-        Button addButton = (Button) findViewById(R.id.btn_addgoal);
+        spinner = (Spinner) findViewById(R.id.spinner_goalunits);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, Units.getUnitStrings());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
-        Log.i("Add Goal", "Opened Add Goal!");
+        Button addButton = (Button) findViewById(R.id.btn_addgoal);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,11 +53,18 @@ public class AddGoal extends AppCompatActivity {
                 goingBack.putExtra(BundleConstants.goalName, goalName);
                 goingBack.putExtra(BundleConstants.goalValue, goalValue);
                 goingBack.putExtra(BundleConstants.goalIsCurrent, setAsCurrent);
-                goingBack.putExtra(BundleConstants.goalUnits, "Steps");
-                setResult(RESULT_OK, goingBack);
+                goingBack.putExtra(BundleConstants.goalUnits, spinner.getSelectedItem().toString());
+                setResult(1, goingBack);
                 finish();
             }
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent goingBack = new Intent();
+        setResult(0, goingBack);
+        finish();
     }
 }
