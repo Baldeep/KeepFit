@@ -2,7 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="7dp">
+    android:layout_marginBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +24,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="@color/colorSecondaryText"
                 android:textSize="@dimen/text_row_sub_title_size"
                 android:textStyle="bold"
                 android:id="@+id/txt_history_activitydate_row"
@@ -48,15 +55,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/progressBar_history_steps"
         android:layout_marginTop="5dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp" />
+        android:progressTint="@color/colorPrimary"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorSecondaryText"
+        android:textColor="@color/colorPrimaryText"
         android:textSize="@dimen/text_row_sub_title_size"
         android:id="@+id/txt_history_value_row"
         android:text="15000 steps"/>
 
+    </LinearLayout>
 </LinearLayout>

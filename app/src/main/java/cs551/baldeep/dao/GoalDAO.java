@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
+import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class GoalDAO {
 
     public GoalDAO(Context context) throws SQLException {
         DBHelper db = new DBHelper(context);
+
         goalDAO = db.getGoalDAO();
     }
 
@@ -43,6 +45,43 @@ public class GoalDAO {
         } catch (SQLException e) {
             Log.e("GoalDAO", "Failed to save Goal.\n" + e.toString());
             return false;
+        }
+    }
+
+    public Goal findById(String goalUUID){
+        try {
+            return goalDAO.queryForId(goalUUID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean deleteAll(){
+        try {
+            TableUtils.clearTable(goalDAO.getConnectionSource(), Goal.class);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Goal> findAllNotCurrentNotFinished(){
+        try{
+            QueryBuilder<Goal, String> queryBuilder = goalDAO.queryBuilder();
+
+            Where where = queryBuilder.where();
+            where.ne(Goal.CURRENT_GOAL, true);
+            where.and();
+            where.ne(Goal.GOAL_DONE, true);
+
+            PreparedQuery<Goal> query = queryBuilder.prepare();
+            return goalDAO.query(query);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<Goal>();
         }
     }
 
@@ -85,4 +124,29 @@ public class GoalDAO {
     }
 
 
+    public boolean deleteById(String goalUUID) {
+        try {
+            goalDAO.deleteById(goalUUID);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Goal> findAllFinished() {
+        try{
+            QueryBuilder<Goal, String> queryBuilder = goalDAO.queryBuilder();
+
+            Where where = queryBuilder.where();
+            where.eq(Goal.GOAL_DONE, true);
+
+            PreparedQuery<Goal> query = queryBuilder.prepare();
+            return goalDAO.query(query);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<Goal>();
+        }
+    }
 }

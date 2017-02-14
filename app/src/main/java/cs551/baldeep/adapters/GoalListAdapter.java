@@ -12,6 +12,7 @@ import java.util.List;
 
 import cs551.baldeep.keepfit.R;
 import cs551.baldeep.models.Goal;
+import cs551.baldeep.utils.Units;
 
 /**
  * Created by balde on 11/02/2017.
@@ -39,6 +40,11 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
 
         goalName.setText(getItem(position).getName());
 
+        if(getItem(position).getGoalUnits().equals(Units.STEPS)){
+            goalMax.setText((int) getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
+        } else {
+            goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
+        }
         goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
 
         return goalRow;
