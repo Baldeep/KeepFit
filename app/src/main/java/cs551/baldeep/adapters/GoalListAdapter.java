@@ -41,12 +41,10 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         goalName.setText(getItem(position).getName());
 
         if(getItem(position).getGoalUnits().equals(Units.STEPS)){
-            goalMax.setText((int) getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
+            goalMax.setText(((int) getItem(position).getGoalValue()) + " " + getItem(position).getGoalUnits());
         } else {
             goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
         }
-        goalMax.setText(getItem(position).getGoalValue() + " " + getItem(position).getGoalUnits());
-
         return goalRow;
     }
 

@@ -49,6 +49,16 @@ public class AddGoalPage extends AppCompatActivity {
         EditText goalValueTxt = (EditText) findViewById(R.id.txt_goalmax);
         CheckBox setAsCurrentCheck = (CheckBox) findViewById(R.id.checkbox_setcurrent);
 
+        spinner = (Spinner) findViewById(R.id.spinner_goalunits);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, Units.getUnitStrings());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+
+        Button addButton = (Button) findViewById(R.id.btn_addgoal);
+
+
         if(getIntent().getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)){
             Goal goal = goalDAO.findById(getIntent().getStringExtra(Constants.GOAL_ID));
             goalNameTxt.setText(goal.getName());
@@ -56,15 +66,9 @@ public class AddGoalPage extends AppCompatActivity {
             if(goal.isCurrentGoal()){
                 setAsCurrentCheck.setChecked(true);
             }
+            spinner.setSelection(adapter.getPosition(goal.getGoalUnits()));
+            addButton.setText("Save");
         }
-
-        spinner = (Spinner) findViewById(R.id.spinner_goalunits);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, Units.getUnitStrings());
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        Button addButton = (Button) findViewById(R.id.btn_addgoal);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,14 +119,21 @@ public class AddGoalPage extends AppCompatActivity {
 
     }
 
-    public void delete(){
-        Log.i("Edit goal page","Deleting Goal with id: " + getIntent().getStringExtra(Constants.GOAL_ID));
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("AddGoalPage - 135: ", "Returned to AddGoalPage");
+        if(resultCode == 1){
+            Toast.makeText(this, "Confirmed", Toast.LENGTH_SHORT);
+        }
     }
 
     @Override
-    public void onBackPressed() {
+    protected void onDestroy() {
         Intent goingBack = new Intent();
-        setResult(0, goingBack);
+        goingBack.putExtra(Constants.ADD_GOAL_MODE, getIntent().getStringExtra(Constants.ADD_GOAL_MODE));
+        setResult(1, goingBack);
         finish();
+        super.onDestroy();
     }
 }

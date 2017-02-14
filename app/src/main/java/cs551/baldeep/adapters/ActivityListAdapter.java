@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,13 +35,15 @@ public class ActivityListAdapter extends ArrayAdapter<Goal> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        View activtyRow = inflater.inflate(R.layout.history_list_row_layout, parent, false);
+        View activityRow = inflater.inflate(R.layout.history_list_row_layout, parent, false);
 
-        TextView activityDate = (TextView) activtyRow.findViewById(R.id.txt_history_activitydate_row);
-        TextView goalName = (TextView) activtyRow.findViewById(R.id.txt_history_goalname_row);
-        TextView activityValue = (TextView) activtyRow.findViewById(R.id.txt_history_value_row);
+        TextView activityDate = (TextView) activityRow.findViewById(R.id.txt_history_activitydate_row);
+        TextView goalName = (TextView) activityRow.findViewById(R.id.txt_history_goalname_row);
+        TextView activityValue = (TextView) activityRow.findViewById(R.id.txt_history_value_row);
 
-        ProgressBar goalProgress = (ProgressBar)  activtyRow.findViewById(R.id.progressBar_history_steps);
+        ProgressBar goalProgress = (ProgressBar)  activityRow.findViewById(R.id.progressBar_history_steps);
+
+        ImageView imageView = (ImageView) activityRow.findViewById(R.id.image_row_completed_icon);
 
         SimpleDateFormat sdf = new SimpleDateFormat("MMM-dd (EEE)");
 
@@ -56,9 +59,13 @@ public class ActivityListAdapter extends ArrayAdapter<Goal> {
                     + "/" + getItem(position).getGoalValue()
                     + " " + g.getGoalUnits());
         }
+        if(g.getPercentageCompleted() >= 100){
+            imageView.setVisibility(View.VISIBLE);
+        }
+
 
         goalProgress.setProgress((int)g.getPercentageCompleted());
 
-        return activtyRow;
+        return activityRow;
     }
 }

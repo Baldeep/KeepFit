@@ -1,6 +1,7 @@
 package cs551.baldeep.keepfit;
 
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
@@ -43,6 +44,8 @@ import cs551.baldeep.adapters.ActivityListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.constants.Constants;
 import cs551.baldeep.dao.GoalDAO;
+import cs551.baldeep.dialogs.AddActivityDialog;
+import cs551.baldeep.dialogs.ConfirmDialog;
 import cs551.baldeep.models.Goal;
 import cs551.baldeep.utils.Units;
 
@@ -139,7 +142,12 @@ public class HomePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "Clicked Progress circle", Toast.LENGTH_SHORT).show();
-                addActivityToGoal();
+                DialogFragment addActivityDialog = new AddActivityDialog();
+                Bundle addActivityBundle = new Bundle();
+                addActivityBundle.putString(Constants.GOAL_ID, currentGoal.getGoalUUID());
+                addActivityDialog.setArguments(addActivityBundle);
+
+                addActivityDialog.show(getFragmentManager(), "Add Activity");
             }
         });
 
@@ -172,80 +180,81 @@ public class HomePage extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.nav_settings){
                     Log.d("Nav Menu", "Pressed settings ****************************");
-                    /*FragmentManager mFragmentManager = getFragmentManager();
+                    FragmentManager mFragmentManager = getFragmentManager();
                     FragmentTransaction mFragmentTransaction = mFragmentManager
                             .beginTransaction();
                     SettingsPageFrag mPrefsFragment = new SettingsPageFrag();
                     mFragmentTransaction.replace(android.R.id.content, mPrefsFragment);
-                    mFragmentTransaction.commit();*/
-                    goalDAO.deleteAll();
+                    mFragmentTransaction.commit();
+                    //goalDAO.deleteAll();
                 }
                 return true;
             }
         });
 
-        updateUI();
+        updateHomePage();
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
 
         Log.i("HomePage.OnResult", "requestCode: " + requestCode + ", resultCode: " + resultCode);
         if(resultCode == RESULT_ADD_GOAL){
             if(data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.DELETE)){
                 Toast.makeText(this, "DELETE", Toast.LENGTH_SHORT);
-            }
+            } else {
 
-            String goalName = data.getStringExtra(Constants.GOAL_NAME);
-            double goalValue = data.getDoubleExtra(Constants.GOAL_VALUE, 0);
-            String goalUnits = data.getStringExtra(Constants.GOAL_UNITS);
+                String goalName = data.getStringExtra(Constants.GOAL_NAME);
+                double goalValue = data.getDoubleExtra(Constants.GOAL_VALUE, 0);
+                String goalUnits = data.getStringExtra(Constants.GOAL_UNITS);
 
-            Log.d("Return from Add", "goalval: " + goalValue);
+                Log.d("Return from Add", "goalval: " + goalValue);
 
-            Goal newGoal = new Goal(goalName, goalValue, goalUnits);
+                Goal newGoal = new Goal(goalName, goalValue, goalUnits);
 
-            // if the new goal has been set as current, switch current
-            if(data.getBooleanExtra(Constants.GOAL_CURRENT, false)){
-                Toast.makeText(this, "Current Goal has changed", Toast.LENGTH_SHORT);
-                // set new as current
-                newGoal.setGoalCompleted(currentGoal.getGoalCompleted());
-                newGoal.setDateOfGoal(today);
-                newGoal.setCurrentGoal(true);
-
-                // clear current
-                currentGoal.setCurrentGoal(false);
-            }
-
-            // if the goal is new, add it
-            if(data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.ADD)){
-
-                // if there is no current goal, make the new goal the current goal
-                if(currentGoal == null){
-                    newGoal.setCurrentGoal(true);
+                // if the new goal has been set as current, switch current
+                if (data.getBooleanExtra(Constants.GOAL_CURRENT, false)) {
+                    Toast.makeText(this, "Current Goal has changed", Toast.LENGTH_SHORT);
+                    // set new as current
+                    newGoal.setGoalCompleted(currentGoal.getGoalCompleted());
                     newGoal.setDateOfGoal(today);
+                    newGoal.setCurrentGoal(true);
+
+                    // clear current
+                    currentGoal.setCurrentGoal(false);
+                }
+
+                // if the goal is new, add it
+                if (data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.ADD)) {
+
+                    // if there is no current goal, make the new goal the current goal
+                    if (currentGoal == null) {
+                        newGoal.setCurrentGoal(true);
+                        newGoal.setDateOfGoal(today);
+                        currentGoal = newGoal;
+                    }
+
+                    goalDAO.saveOrUpdate(newGoal);
+                } else if (data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)) {
+                    // Editing goal, just get its uuid and update it.
+                    newGoal.setGoalUUID(data.getStringExtra(Constants.GOAL_ID));
+                    goalDAO.saveOrUpdate(newGoal);
+                }
+
+                boolean newGoalIsCurrent = data.getBooleanExtra(Constants.GOAL_CURRENT, false);
+
+                if (currentGoal == null) {
                     currentGoal = newGoal;
-                }
-
-                goalDAO.saveOrUpdate(newGoal);
-            } else if(data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)){
-                // Editing goal, just get its uuid and update it.
-                newGoal.setGoalUUID(data.getStringExtra(Constants.GOAL_ID));
-                goalDAO.saveOrUpdate(newGoal);
-            }
-
-            boolean newGoalIsCurrent = data.getBooleanExtra(Constants.GOAL_CURRENT, false);
-
-            if(currentGoal == null){
-                currentGoal = newGoal;
-                currentGoal.setCurrentGoal(true);
-                currentGoal.setDateOfGoal(today);
-                if(!goalDAO.saveOrUpdate(newGoal)){
-                    Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT).show();
-                }
-                Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT).show();
-            } else if(newGoalIsCurrent){
+                    currentGoal.setCurrentGoal(true);
+                    currentGoal.setDateOfGoal(today);
+                    if (!goalDAO.saveOrUpdate(newGoal)) {
+                        Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT).show();
+                    }
+                    Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT).show();
+                } else if (newGoalIsCurrent) {
                     newGoal.setGoalCompleted(currentGoal.getGoalCompleted());
                     newGoal.setDateOfGoal(today);
                     newGoal.setCurrentGoal(true);
@@ -255,36 +264,17 @@ public class HomePage extends AppCompatActivity {
                     goalDAO.saveOrUpdate(currentGoal);
                     currentGoal = newGoal;
 
+                }
             }
-
-            updateUI();
+            updateHomePage();
         } else if(resultCode == RESULT_SETTINGS){
-            updateUI();
+            //();
         }
-        updateUI();
+        //updateUI();
     }
 
     private void addActivityToGoal(){
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View dialog_layout = inflater.inflate(R.layout.dialog_add_activity, null);
 
-        Spinner addActivityUnitsSpinner = (Spinner) dialog_layout.findViewById(R.id.spinner_activityunits);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, Units.getUnitStrings());
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        addActivityUnitsSpinner.setAdapter(adapter);
-
-        AlertDialog.Builder db = new AlertDialog.Builder(HomePage.this);
-        db.setView(dialog_layout);
-        db.setTitle("Add Goal");
-        db.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //Toast.makeText(getApplicationContext(), "Units: " + addActivityUnitsSpinner.getSelectedItem().toString(), )
-            }
-        });
-
-        AlertDialog dialog = db.show();
     }
 
     private void setUpTabs(){
@@ -368,7 +358,12 @@ public class HomePage extends AppCompatActivity {
         return true;
     }*/
 
-    private void updateUI(){
+    private void updateHomePage(){
+        updateCurrentGoal();
+        updateGoalList();
+    }
+
+    private void updateCurrentGoal(){
 
         if(currentGoal != null) {
             Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalValue()
@@ -401,7 +396,9 @@ public class HomePage extends AppCompatActivity {
         } else {
             progressText.setText("0/0 Steps");
         }
+    }
 
+    private void updateGoalList(){
         // ListView HomePage
         goalList = goalDAO.findAllNotCurrentNotFinished();
         ListAdapter goalListAdapter = new GoalListAdapter(this, goalList);

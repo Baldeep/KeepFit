@@ -29,13 +29,13 @@
             android:text="100"
             android:textSize="20dp"
             android:ems="10"
-            android:id="@+id/txt_goalmax" />
+            android:id="@+id/txt_activity_entered" />
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.6"
-            android:id="@+id/spinner_activityunits" />
+            android:id="@+id/spinner_activity_entered_units" />
 
 
 
