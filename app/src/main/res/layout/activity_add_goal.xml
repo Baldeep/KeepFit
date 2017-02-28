@@ -25,7 +25,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txt_goalname_label"
-                    android:textSize="@dimen/text_sub_title_size"
+                    android:textSize="@dimen/text_h2"
                     android:textColor="@color/colorPrimaryText"/>
 
                     <EditText
@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/txt_goalvalue_label"
-                    android:textSize="@dimen/text_sub_title_size"
+                    android:textSize="@dimen/text_h2"
                     android:textColor="@color/colorPrimaryText"/>
 
                 <EditText

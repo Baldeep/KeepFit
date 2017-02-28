@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/txt_goalvalue_label"
-            android:textSize="@dimen/text_sub_title_size"
+            android:textSize="@dimen/text_h3"
             android:textColor="@color/colorPrimaryText"
             android:visibility="gone"/>
 

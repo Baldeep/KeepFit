@@ -34,6 +34,8 @@ import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
+import org.w3c.dom.Text;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class HomePage extends AppCompatActivity {
     private List<Goal> goalList;
 
     private TextView dailyGoalName;
+    private TextView progressBarText;
     private CircleProgressView mCircleProgressView;
     private TextView progressText;
     private Spinner addActivityUnitsSpinner;
@@ -90,9 +93,11 @@ public class HomePage extends AppCompatActivity {
 
         setUpTabs();
 
+        progressBarText = (TextView) findViewById(R.id.txt_progress_view);
         dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
         mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
         mCircleProgressView.setInterpolator(new AccelerateDecelerateInterpolator());
+        mCircleProgressView.setStartAngle(-90);
         progressText = (TextView) findViewById(R.id.txt_goalprogress);
 
 
@@ -117,23 +122,24 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        /*List<Goal> doneGoals = new ArrayList<Goal>();
+        List<Goal> doneGoals = new ArrayList<Goal>();
         Random r = new Random();
         for(int i = 0; i < 7; i++){
             Goal g = new Goal("Goal " + i, i * 1000, Units.STEPS);
+            g.setGoalUUID("oldgoals-" + i);
             g.setDateOfGoal(new Date(System.currentTimeMillis() - (86400002 * i)));
             g.setGoalCompleted(r.nextInt((i * 1000)+ 500));
             g.setDone(true);
             goalDAO.saveOrUpdate(g);
             doneGoals.add(g);
-        }*/
-        List<Goal> doneGoals = goalDAO.findAllFinished();
+        }
+
+        List<Goal> goalsFinished = goalDAO.findAllFinished();
         listOfHistory = (ListView) findViewById(R.id.list_history);
-        ListAdapter historyAdapter = new ActivityListAdapter(this,doneGoals);
+        ListAdapter historyAdapter = new ActivityListAdapter(this,goalsFinished);
         listOfHistory.setAdapter(historyAdapter);
         listOfHistory.setFocusable(false);
         setListViewHeightBasedOnItems(listOfHistory);
-
 
 
 
@@ -187,6 +193,9 @@ public class HomePage extends AppCompatActivity {
                     mFragmentTransaction.replace(android.R.id.content, mPrefsFragment);
                     mFragmentTransaction.commit();
                     //goalDAO.deleteAll();
+                } else if(item.getItemId() == R.id.nav_deleteall){
+                    goalDAO.deleteAll();
+                    updateHomePage();
                 }
                 return true;
             }
@@ -379,10 +388,12 @@ public class HomePage extends AppCompatActivity {
 
         // ProgressBar
         if(currentGoal != null){
-            mCircleProgressView.setTextString("Add Activity");
+            progressBarText.setText("Add\nActivity");
+            mCircleProgressView.setProgress(currentGoal.getPercentageCompleted());
         } else {
-            mCircleProgressView.setTextString("No goal");
+            progressBarText.setText("No\ngoal");
         }
+
 
         // Progress Text
         if(currentGoal != null){
