@@ -19,6 +19,7 @@ import cs551.baldeep.constants.Constants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.dialogs.ConfirmDialog;
 import cs551.baldeep.models.Goal;
+import cs551.baldeep.utils.GoalUtils;
 import cs551.baldeep.utils.Units;
 
 /**
@@ -28,6 +29,7 @@ import cs551.baldeep.utils.Units;
 public class AddGoalPage extends AppCompatActivity {
 
     protected Spinner spinner;
+    private Button clearButton;
 
     private GoalDAO goalDAO;
 
@@ -45,7 +47,7 @@ public class AddGoalPage extends AppCompatActivity {
             ueh.uncaughtException(Thread.currentThread(), e);*/
         }
 
-        EditText goalNameTxt = (EditText) findViewById(R.id.txt_goalname);
+        final EditText goalNameTxt = (EditText) findViewById(R.id.txt_goalname);
         EditText goalValueTxt = (EditText) findViewById(R.id.txt_goalmax);
         CheckBox setAsCurrentCheck = (CheckBox) findViewById(R.id.checkbox_setcurrent);
 
@@ -55,6 +57,13 @@ public class AddGoalPage extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
+        clearButton = (Button) findViewById(R.id.btn_clear_goal_name);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goalNameTxt.setText("");
+            }
+        });
 
         Button addButton = (Button) findViewById(R.id.btn_addgoal);
 
@@ -77,8 +86,27 @@ public class AddGoalPage extends AppCompatActivity {
                 EditText goalNameTxt = (EditText) findViewById(R.id.txt_goalname);
                 String goalName = String.valueOf(goalNameTxt.getText());
 
+                if(goalName.trim().isEmpty()){
+                    goalName="My Goal";
+                }
+
                 EditText goalValueTxt = (EditText) findViewById(R.id.txt_goalmax);
-                double goalValue = Double.valueOf(String.valueOf(goalValueTxt.getText()));
+
+                String goalUnits = spinner.getSelectedItem().toString();
+                String goalValueString = String.valueOf(goalValueTxt.getText());
+
+                double goalValue = 0;
+                if(goalValueString.trim().isEmpty()){
+                    if(goalUnits.equals(Units.STEPS)){
+                        goalValue = 10000;
+                    } else {
+                        goalValue = Units.getStepsInUnits(goalUnits, 10000);
+                    }
+                } else {
+                    goalValue = Double.valueOf(goalValueString);
+                }
+
+                Log.i("ADDING GOAL", "goalVal: " + goalValue);
 
                 CheckBox setAsCurrentCheck = (CheckBox) findViewById(R.id.checkbox_setcurrent);
                 boolean setAsCurrent = setAsCurrentCheck.isChecked();
@@ -88,7 +116,7 @@ public class AddGoalPage extends AppCompatActivity {
                 goingBack.putExtra(Constants.GOAL_NAME, goalName);
                 goingBack.putExtra(Constants.GOAL_VALUE, goalValue);
                 goingBack.putExtra(Constants.GOAL_CURRENT, setAsCurrent);
-                goingBack.putExtra(Constants.GOAL_UNITS, spinner.getSelectedItem().toString());
+                goingBack.putExtra(Constants.GOAL_UNITS, goalUnits);
                 if(getIntent().getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)){
                     goingBack.putExtra(Constants.GOAL_ID, getIntent().getStringExtra(Constants.GOAL_ID));
                 }

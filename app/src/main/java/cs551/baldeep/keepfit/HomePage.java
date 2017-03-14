@@ -1,17 +1,14 @@
 package cs551.baldeep.keepfit;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,8 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -33,8 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
-
-import org.w3c.dom.Text;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -45,9 +38,9 @@ import java.util.Random;
 import cs551.baldeep.adapters.ActivityListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.constants.Constants;
+import cs551.baldeep.controllers.GoalListEditItemOnClickListener;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.dialogs.AddActivityDialog;
-import cs551.baldeep.dialogs.ConfirmDialog;
 import cs551.baldeep.models.Goal;
 import cs551.baldeep.utils.Units;
 
@@ -59,6 +52,8 @@ public class HomePage extends AppCompatActivity {
     private Goal currentGoal;
     private List<Goal> goalList;
 
+    protected DrawerLayout drawer;
+
     private TextView dailyGoalName;
     private TextView progressBarText;
     private CircleProgressView mCircleProgressView;
@@ -66,6 +61,7 @@ public class HomePage extends AppCompatActivity {
     private Spinner addActivityUnitsSpinner;
 
     private ListView listOfGoals;
+    private GoalListEditItemOnClickListener listOfGoalsItemClickListener;
     private ListView listOfHistory;
 
     private GoalDAO goalDAO;
@@ -98,6 +94,8 @@ public class HomePage extends AppCompatActivity {
         mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
         mCircleProgressView.setInterpolator(new AccelerateDecelerateInterpolator());
         mCircleProgressView.setStartAngle(-90);
+
+
         progressText = (TextView) findViewById(R.id.txt_goalprogress);
 
 
@@ -107,20 +105,14 @@ public class HomePage extends AppCompatActivity {
             listReplacementText.setVisibility(View.GONE);
         }
 
+
+
+
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
-        listOfGoals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Goal selected = (Goal) listOfGoals.getItemAtPosition(position);
 
-                Intent editGoal = new Intent(getApplicationContext(), AddGoalPage.class);
-                editGoal.putExtra(Constants.ADD_GOAL_MODE, "edit");
-                editGoal.putExtra(Constants.GOAL_ID, selected.getGoalUUID());
-                startActivityForResult(editGoal, RESULT_EDIT_GOAL);
-
-            }
-        });
+        listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
+        listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
 
         List<Goal> doneGoals = new ArrayList<Goal>();
         Random r = new Random();
@@ -174,25 +166,22 @@ public class HomePage extends AppCompatActivity {
 
 
         // Hamburger menu
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
             this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.nav_settings){
                     Log.d("Nav Menu", "Pressed settings ****************************");
-                    FragmentManager mFragmentManager = getFragmentManager();
-                    FragmentTransaction mFragmentTransaction = mFragmentManager
-                            .beginTransaction();
-                    SettingsPageFrag mPrefsFragment = new SettingsPageFrag();
-                    mFragmentTransaction.replace(android.R.id.content, mPrefsFragment);
-                    mFragmentTransaction.commit();
-                    //goalDAO.deleteAll();
+                    drawer.closeDrawer(Gravity.LEFT);
+                    Intent settingsIntent = new Intent(getApplicationContext(), SettingsPage.class);
+                    startActivity(settingsIntent);
+
                 } else if(item.getItemId() == R.id.nav_deleteall){
                     goalDAO.deleteAll();
                     updateHomePage();
@@ -204,6 +193,8 @@ public class HomePage extends AppCompatActivity {
         updateHomePage();
 
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -367,12 +358,12 @@ public class HomePage extends AppCompatActivity {
         return true;
     }*/
 
-    private void updateHomePage(){
+    public void updateHomePage(){
         updateCurrentGoal();
         updateGoalList();
     }
 
-    private void updateCurrentGoal(){
+    public void updateCurrentGoal(){
 
         if(currentGoal != null) {
             Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalValue()
@@ -409,12 +400,12 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
-    private void updateGoalList(){
+    public void updateGoalList(){
         // ListView HomePage
         goalList = goalDAO.findAllNotCurrentNotFinished();
         ListAdapter goalListAdapter = new GoalListAdapter(this, goalList);
         listOfGoals.setAdapter(goalListAdapter);
-        setListViewHeightBasedOnItems(listOfGoals);
+        //setListViewHeightBasedOnItems(listOfGoals);
     }
 
     /*

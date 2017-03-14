@@ -8,7 +8,7 @@ public class Units {
 
     public static final String STEPS = "Steps";
     public static final String KM = "Km";
-    public static final String M = "m";
+    public static final String M = "Meters";
     public static final String MILES = "Miles";
     public static final String YARDS = "Yards";
 
