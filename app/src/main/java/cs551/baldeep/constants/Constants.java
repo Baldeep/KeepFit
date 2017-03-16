@@ -6,6 +6,10 @@ package cs551.baldeep.constants;
 
 public class Constants {
 
+    public static final String HOME = "Home";
+    public static final String HISTORY = "History";
+    public static final String STATISTICS = "Statistics";
+
     public static final String GOAL = "Goal";
     public static final String GOAL_NAME = "GoalName";
     public static final String GOAL_VALUE = "GoalValue";

@@ -1,7 +1,9 @@
 package cs551.baldeep.keepfit;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +42,7 @@ import cs551.baldeep.listeners.GoalListEditItemOnClickListener;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
 import cs551.baldeep.utils.GoalUtils;
+import cs551.baldeep.utils.UIUtils;
 import cs551.baldeep.utils.Units;
 
 public class HomePage extends AppCompatActivity {
@@ -50,6 +53,8 @@ public class HomePage extends AppCompatActivity {
     private Goal currentGoal;
     private List<Goal> goalList;
 
+    SharedPreferences sharedPreferences;
+
     protected DrawerLayout drawer;
 
     private TextView dailyGoalName;
@@ -57,9 +62,10 @@ public class HomePage extends AppCompatActivity {
     CircleProgressOnClickListener circleListener;
     private CircleProgressView mCircleProgressView;
     private TextView progressText;
-    private Spinner addActivityUnitsSpinner;
+    private FloatingActionButton fab;
 
     private ListView listOfGoals;
+    ListAdapter goalListAdapter;
     private GoalListEditItemOnClickListener listOfGoalsItemClickListener;
     private ListView listOfHistory;
 
@@ -74,6 +80,13 @@ public class HomePage extends AppCompatActivity {
 
         //TODO get date from test mode
         today = new Date(System.currentTimeMillis());
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean testMode = sharedPreferences.getBoolean("test_mode",false);
+
+        if(testMode){
+            Toast.makeText(this, "Test Mode Active", Toast.LENGTH_SHORT).show();
+        }
 
         try {
             goalDAO = new GoalDAO(getApplicationContext());
@@ -105,12 +118,13 @@ public class HomePage extends AppCompatActivity {
 
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
-
+        goalListAdapter = new GoalListAdapter(this, goalList);
         listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
         listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
 
         List<Goal> doneGoals = new ArrayList<Goal>();
         Random r = new Random();
+
         for(int i = 0; i < 7; i++){
             Goal g = new Goal("Goal " + i, i * 1000, Units.STEPS);
             g.setGoalUUID("oldgoals-" + i);
@@ -126,7 +140,7 @@ public class HomePage extends AppCompatActivity {
         ListAdapter historyAdapter = new ActivityListAdapter(this,goalsFinished);
         listOfHistory.setAdapter(historyAdapter);
         listOfHistory.setFocusable(false);
-        setListViewHeightBasedOnItems(listOfHistory);
+        UIUtils.setListViewHeightBasedOnItems(listOfHistory);
 
 
 
@@ -139,7 +153,7 @@ public class HomePage extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Action Button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_addgoal);
+        fab = (FloatingActionButton) findViewById(R.id.fab_addgoal);
         FABOnClickListener fabOnClickListener = new FABOnClickListener(this, RESULT_ADD_GOAL);
         fab.setOnClickListener(fabOnClickListener);
 
@@ -204,13 +218,19 @@ public class HomePage extends AppCompatActivity {
             }
             updateHomePage();
         } else if(resultCode == RESULT_SETTINGS){
-            //();
+
         }
-        //updateUI();
     }
 
-    private void addActivityToGoal(){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean testMode = sharedPreferences.getBoolean("test_mode",false);
 
+        if(testMode){
+            Toast.makeText(this, "Test Mode Active", Toast.LENGTH_SHORT).show();
+        }
+        updateHomePage();
     }
 
     private void setUpTabs(){
@@ -219,22 +239,33 @@ public class HomePage extends AppCompatActivity {
         tabHost.setup();
 
         //Home tab
-        TabHost.TabSpec specs = tabHost.newTabSpec("Home");
+        TabHost.TabSpec specs = tabHost.newTabSpec(Constants.HOME);
         specs.setContent(R.id.tabhome);
-        specs.setIndicator("Home");
+        specs.setIndicator(Constants.HOME);
         tabHost.addTab(specs);
 
         // History tab
-        specs = tabHost.newTabSpec("History");
+        specs = tabHost.newTabSpec(Constants.HISTORY);
         specs.setContent(R.id.tabhistory);
-        specs.setIndicator("History");
+        specs.setIndicator(Constants.HISTORY);
         tabHost.addTab(specs);
 
         // Stats tab
-        specs = tabHost.newTabSpec("Statistics");
+        specs = tabHost.newTabSpec(Constants.STATISTICS);
         specs.setContent(R.id.tabstats);
-        specs.setIndicator("Statistics");
+        specs.setIndicator(Constants.STATISTICS);
         tabHost.addTab(specs);
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if(tabId.equals(Constants.HISTORY) || tabId.equals(Constants.STATISTICS)){
+                    fab.hide();
+                } else {
+                    fab.show();
+                }
+            }
+        });
     }
 
     @Override
@@ -269,31 +300,6 @@ public class HomePage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*@SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        *//*if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else *//*if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }*/
-
     public void updateHomePage(){
         updateCurrentGoal();
         updateGoalList();
@@ -314,52 +320,14 @@ public class HomePage extends AppCompatActivity {
             progressBarText.setText("No\ngoal");
 
             progressText.setText("0/0 Steps");
-
         }
     }
 
     public void updateGoalList(){
-        // ListView HomePage
+        // Goals List
         goalList = goalDAO.findAllNotCurrentNotFinished();
         ListAdapter goalListAdapter = new GoalListAdapter(this, goalList);
         listOfGoals.setAdapter(goalListAdapter);
-        //setListViewHeightBasedOnItems(listOfGoals);
     }
 
-    /*
-     * From:
-     * http://stackoverflow.com/questions/1778485/android-listview-display-all-available-items-without-scroll-with-static-header
-     */
-    public static boolean setListViewHeightBasedOnItems(ListView listView) {
-
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter != null) {
-
-            int numberOfItems = listAdapter.getCount();
-
-            // Get total height of all items.
-            int totalItemsHeight = 0;
-            for (int itemPos = 0; itemPos < numberOfItems; itemPos++) {
-                View item = listAdapter.getView(itemPos, null, listView);
-                item.measure(0, 0);
-                totalItemsHeight += item.getMeasuredHeight();
-            }
-
-            // Get total height of all item dividers.
-            int totalDividersHeight = listView.getDividerHeight() *
-                    (numberOfItems - 1);
-
-            // Set list height.
-            ViewGroup.LayoutParams params = listView.getLayoutParams();
-            params.height = totalItemsHeight + totalDividersHeight;
-            listView.setLayoutParams(params);
-            listView.requestLayout();
-
-            return true;
-
-        } else {
-            return false;
-        }
-
-    }
 }

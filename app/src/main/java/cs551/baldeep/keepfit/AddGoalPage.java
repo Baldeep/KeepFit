@@ -38,6 +38,8 @@ public class AddGoalPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_goal);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         try {
             goalDAO = new GoalDAO(getApplicationContext());
         } catch (SQLException e) {
@@ -148,6 +150,12 @@ public class AddGoalPage extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("AddGoalPage - 135: ", "Returned to AddGoalPage");
@@ -158,10 +166,11 @@ public class AddGoalPage extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         Intent goingBack = new Intent();
         goingBack.putExtra(Constants.ADD_GOAL_MODE, getIntent().getStringExtra(Constants.ADD_GOAL_MODE));
         setResult(1, goingBack);
         finish();
-        super.onDestroy();
+
     }
 }
