@@ -61,6 +61,8 @@ public class Units {
                 return getMilesInSteps(value);
             case Units.YARDS:
                 return getYardsInSteps(value);
+            case Units.STEPS:
+                return value;
             default:
                 return 0.0;
         }
@@ -76,6 +78,8 @@ public class Units {
                 return getStepsInMiles(steps);
             case Units.YARDS:
                 return getStepsInYards(steps);
+            case Units.STEPS:
+                return steps;
             default:
                 return 0.0;
         }

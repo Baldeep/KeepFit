@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
@@ -32,17 +33,14 @@ public class GoalUtils {
 
             double progress = g.getGoalCompleted();
 
-            if(g.getGoalUnits().equals(units)){
-                progress += value;
+            double steps = Units.getUnitsInSteps(units, value);
+
+            if(g.getGoalUnits().equals(Units.STEPS)){
+                progress += steps;
             } else {
-                double steps = Units.getUnitsInSteps(units, value);
-                if(g.getGoalUnits().equals(Units.STEPS)){
-                    progress += steps;
-                } else {
-                    double val = Units.getStepsInUnits(g.getGoalUnits(), steps);
-                    progress += val;
-                }
+                progress += Units.getStepsInUnits(g.getGoalUnits(), steps);
             }
+
             g.setGoalCompleted(progress);
 
             goalDAO.saveOrUpdate(g);
@@ -50,18 +48,18 @@ public class GoalUtils {
         return g;
     }
 
-    public boolean switchCurrentGoal(String newGoalUUID, String oldGoalUUID){
-        Goal newGoal = goalDAO.findById(newGoalUUID);
-        Goal oldGoal = goalDAO.findById(oldGoalUUID);
+    public static String getFormattedProgressString(Goal g){
+        String formatted = "";
+        if(g.getGoalUnits().equals(Units.STEPS)){
+            DecimalFormat df = new DecimalFormat("0");
+            formatted += df.format(g.getGoalCompleted()) + "/" + (int)g.getGoalValue()
+                    + " " + g.getGoalUnits();
+        } else {
+            DecimalFormat df = new DecimalFormat("#.000");
+            formatted += df.format(g.getGoalCompleted()) + "/" + g.getGoalValue()
+                    + " " + g.getGoalUnits();
+        }
 
-        newGoal.setCurrentGoal(true);
-        oldGoal.setCurrentGoal(false);
-
-        addActivityToGoal(newGoalUUID, oldGoal.getGoalCompleted(), oldGoal.getGoalUnits());
-        oldGoal.setGoalCompleted(0);
-
-        newGoal.setDateOfGoal(oldGoal.getDateOfGoal());
-
-        return false;
+        return formatted;
     }
 }

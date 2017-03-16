@@ -18,6 +18,13 @@ public class Constants {
     public static final String ADD = "add";
     public static final String DELETE = "delete";
 
+    public static final String TITLE = "title";
+    public static final String MESSAGE = "message";
+    public static final String MODE = "mode";
+    public static final String ERROR = "error";
+
+
+
     public static final String TEST_MODE = "test_mode";
 
 }

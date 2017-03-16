@@ -41,6 +41,62 @@
                     android:layout_height="match_parent">
 
                     <LinearLayout
+                        android:id="@+id/tabhistory"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="fill_parent"
+                            android:layout_height="1dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_centerVertical="true"
+                            android:background="@color/colorDivider" />
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                                android:orientation="vertical">
+
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/activity_horizontal_margin"
+                                    android:text="Your Goal History: "
+                                    android:textColor="@color/colorPrimaryText"
+                                    android:textSize="@dimen/text_h2" />
+
+                                <View
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_alignParentTop="true"
+                                    android:layout_centerVertical="true"
+                                    android:background="@color/colorDivider" />
+
+                                <ListView
+                                    android:id="@+id/list_history"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="200dp"
+                                    android:divider="@color/colorDivider"
+                                    android:dividerHeight="1dp"
+                                    android:footerDividersEnabled="true"
+                                    android:headerDividersEnabled="true">
+
+                                </ListView>
+
+
+                            </LinearLayout>
+                        </ScrollView>
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/tabhome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -227,61 +283,6 @@
 
                         </LinearLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/tabhistory"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-                        <View
-                            android:background="@color/colorDivider"
-                            android:layout_width = "fill_parent"
-                            android:layout_height="1dp"
-                            android:layout_centerVertical ="true"
-                            android:layout_alignParentTop="true"/>
-
-                            <ScrollView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:orientation="vertical"
-                                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                                        android:layout_marginRight="@dimen/activity_horizontal_margin">
-
-
-                                        <TextView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:textColor="@color/colorPrimaryText"
-                                            android:textSize="@dimen/text_h2"
-                                            android:text="Your Goal History: "
-                                            android:layout_marginTop="@dimen/activity_horizontal_margin"/>
-
-                                        <View
-                                            android:background="@color/colorDivider"
-                                            android:layout_width = "fill_parent"
-                                            android:layout_height="1dp"
-                                            android:layout_centerVertical ="true"
-                                            android:layout_alignParentTop="true"/>
-
-                                        <ListView
-                                            android:layout_width="match_parent"
-                                            android:layout_height="200dp"
-                                            android:id="@+id/list_history"
-                                            android:divider="@color/colorDivider"
-                                            android:dividerHeight="1dp"
-                                            android:headerDividersEnabled="true"
-                                            android:footerDividersEnabled="true">
-
-                                        </ListView>
-
-
-                                    </LinearLayout>
-                            </ScrollView>
                     </LinearLayout>
 
 

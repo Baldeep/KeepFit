@@ -1,7 +1,6 @@
-package cs551.baldeep.controllers;
+package cs551.baldeep.listeners;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;

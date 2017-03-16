@@ -1,14 +1,9 @@
 package cs551.baldeep.keepfit;
 
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,10 +33,13 @@ import java.util.Random;
 import cs551.baldeep.adapters.ActivityListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.constants.Constants;
-import cs551.baldeep.controllers.GoalListEditItemOnClickListener;
+import cs551.baldeep.listeners.CircleProgressOnClickListener;
+import cs551.baldeep.listeners.DrawerItemSelectedListener;
+import cs551.baldeep.listeners.FABOnClickListener;
+import cs551.baldeep.listeners.GoalListEditItemOnClickListener;
 import cs551.baldeep.dao.GoalDAO;
-import cs551.baldeep.dialogs.AddActivityDialog;
 import cs551.baldeep.models.Goal;
+import cs551.baldeep.utils.GoalUtils;
 import cs551.baldeep.utils.Units;
 
 public class HomePage extends AppCompatActivity {
@@ -56,6 +54,7 @@ public class HomePage extends AppCompatActivity {
 
     private TextView dailyGoalName;
     private TextView progressBarText;
+    CircleProgressOnClickListener circleListener;
     private CircleProgressView mCircleProgressView;
     private TextView progressText;
     private Spinner addActivityUnitsSpinner;
@@ -98,15 +97,11 @@ public class HomePage extends AppCompatActivity {
 
         progressText = (TextView) findViewById(R.id.txt_goalprogress);
 
-
         // Goals List View
         if(goalList.size()>0){
             TextView listReplacementText = (TextView) findViewById(R.id.txt_no_goals_list_replacement);
             listReplacementText.setVisibility(View.GONE);
         }
-
-
-
 
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
@@ -136,18 +131,8 @@ public class HomePage extends AppCompatActivity {
 
 
         // Clicking progressBar
-        mCircleProgressView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "Clicked Progress circle", Toast.LENGTH_SHORT).show();
-                DialogFragment addActivityDialog = new AddActivityDialog();
-                Bundle addActivityBundle = new Bundle();
-                addActivityBundle.putString(Constants.GOAL_ID, currentGoal.getGoalUUID());
-                addActivityDialog.setArguments(addActivityBundle);
-
-                addActivityDialog.show(getFragmentManager(), "Add Activity");
-            }
-        });
+        circleListener = new CircleProgressOnClickListener(getFragmentManager(), currentGoal);
+        mCircleProgressView.setOnClickListener(circleListener);
 
         // ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -155,14 +140,8 @@ public class HomePage extends AppCompatActivity {
 
         // Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_addgoal);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent addGoalScreen = new Intent(view.getContext(),  AddGoalPage.class);
-                addGoalScreen.putExtra(Constants.ADD_GOAL_MODE, Constants.ADD);
-                startActivityForResult(addGoalScreen, RESULT_ADD_GOAL);
-            }
-        });
+        FABOnClickListener fabOnClickListener = new FABOnClickListener(this, RESULT_ADD_GOAL);
+        fab.setOnClickListener(fabOnClickListener);
 
 
         // Hamburger menu
@@ -173,22 +152,8 @@ public class HomePage extends AppCompatActivity {
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.getItemId() == R.id.nav_settings){
-                    Log.d("Nav Menu", "Pressed settings ****************************");
-                    drawer.closeDrawer(Gravity.LEFT);
-                    Intent settingsIntent = new Intent(getApplicationContext(), SettingsPage.class);
-                    startActivity(settingsIntent);
-
-                } else if(item.getItemId() == R.id.nav_deleteall){
-                    goalDAO.deleteAll();
-                    updateHomePage();
-                }
-                return true;
-            }
-        });
+        DrawerItemSelectedListener navListener = new DrawerItemSelectedListener(this, goalDAO, drawer);
+        navigationView.setNavigationItemSelectedListener(navListener);
 
         updateHomePage();
 
@@ -211,60 +176,31 @@ public class HomePage extends AppCompatActivity {
                 double goalValue = data.getDoubleExtra(Constants.GOAL_VALUE, 0);
                 String goalUnits = data.getStringExtra(Constants.GOAL_UNITS);
 
-                Log.d("Return from Add", "goalval: " + goalValue);
-
                 Goal newGoal = new Goal(goalName, goalValue, goalUnits);
 
-                // if the new goal has been set as current, switch current
-                if (data.getBooleanExtra(Constants.GOAL_CURRENT, false)) {
-                    Toast.makeText(this, "Current Goal has changed", Toast.LENGTH_SHORT);
-                    // set new as current
-                    newGoal.setGoalCompleted(currentGoal.getGoalCompleted());
-                    newGoal.setDateOfGoal(today);
-                    newGoal.setCurrentGoal(true);
-
-                    // clear current
-                    currentGoal.setCurrentGoal(false);
+                // Use old ID if it's edited
+                if (data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)) {
+                    newGoal.setGoalUUID(data.getStringExtra(Constants.GOAL_ID));
                 }
 
-                // if the goal is new, add it
-                if (data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.ADD)) {
-
-                    // if there is no current goal, make the new goal the current goal
-                    if (currentGoal == null) {
+                // if it's been set as current
+                if(currentGoal == null || data.getBooleanExtra(Constants.GOAL_CURRENT, false)){
+                    if(currentGoal == null) {
                         newGoal.setCurrentGoal(true);
                         newGoal.setDateOfGoal(today);
-                        currentGoal = newGoal;
+                    } else {
+                        currentGoal.setCurrentGoal(false);
+
+                        newGoal.setCurrentGoal(true);
+                        double steps = Units.getUnitsInSteps(currentGoal.getGoalUnits(), currentGoal.getGoalCompleted());
+                        newGoal.setGoalCompleted(Units.getStepsInUnits(newGoal.getGoalUnits(), steps));
+                        newGoal.setDateOfGoal(today);
                     }
-
-                    goalDAO.saveOrUpdate(newGoal);
-                } else if (data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)) {
-                    // Editing goal, just get its uuid and update it.
-                    newGoal.setGoalUUID(data.getStringExtra(Constants.GOAL_ID));
-                    goalDAO.saveOrUpdate(newGoal);
-                }
-
-                boolean newGoalIsCurrent = data.getBooleanExtra(Constants.GOAL_CURRENT, false);
-
-                if (currentGoal == null) {
-                    currentGoal = newGoal;
-                    currentGoal.setCurrentGoal(true);
-                    currentGoal.setDateOfGoal(today);
-                    if (!goalDAO.saveOrUpdate(newGoal)) {
-                        Toast.makeText(this, "Failed to add Goal", Toast.LENGTH_SHORT).show();
-                    }
-                    Toast.makeText(this, "Current Goal set", Toast.LENGTH_SHORT).show();
-                } else if (newGoalIsCurrent) {
-                    newGoal.setGoalCompleted(currentGoal.getGoalCompleted());
-                    newGoal.setDateOfGoal(today);
-                    newGoal.setCurrentGoal(true);
-                    currentGoal.setCurrentGoal(false);
-
-                    goalDAO.saveOrUpdate(newGoal);
                     goalDAO.saveOrUpdate(currentGoal);
                     currentGoal = newGoal;
-
                 }
+
+                goalDAO.saveOrUpdate(newGoal);
             }
             updateHomePage();
         } else if(resultCode == RESULT_SETTINGS){
@@ -364,39 +300,21 @@ public class HomePage extends AppCompatActivity {
     }
 
     public void updateCurrentGoal(){
-
-        if(currentGoal != null) {
-            Log.d("Home", currentGoal.getName() + ": " + currentGoal.getGoalValue()
-                    + " " + currentGoal.getGoalUnits());
-        }
-
         // Goal name heading
         if(currentGoal != null){
             dailyGoalName.setText(currentGoal.getName());
-        } else {
-            dailyGoalName.setText(R.string.no_goal_message);
-        }
 
-        // ProgressBar
-        if(currentGoal != null){
             progressBarText.setText("Add\nActivity");
             mCircleProgressView.setProgress(currentGoal.getPercentageCompleted());
+
+            progressText.setText(GoalUtils.getFormattedProgressString(currentGoal));
         } else {
+            dailyGoalName.setText(R.string.no_goal_message);
+
             progressBarText.setText("No\ngoal");
-        }
 
-
-        // Progress Text
-        if(currentGoal != null){
-            if(currentGoal.getGoalUnits().equals(Units.STEPS)){
-                progressText.setText((int)currentGoal.getGoalCompleted() + "/" + (int)currentGoal.getGoalValue()
-                        + " " + currentGoal.getGoalUnits());
-            } else {
-                progressText.setText(currentGoal.getGoalCompleted() + "/" + currentGoal.getGoalValue()
-                        + " " + currentGoal.getGoalUnits());
-            }
-        } else {
             progressText.setText("0/0 Steps");
+
         }
     }
 
