@@ -53,16 +53,9 @@ public class HomePage extends AppCompatActivity {
     private List<Goal> goalList;
 
     private SharedPreferences sharedPreferences;
-
-
     protected DrawerLayout drawer;
 
-    private TextView testModeText;
-    private TextView dailyGoalName;
-    private TextView progressBarText;
-    private CircleProgressOnClickListener circleListener;
     private CircleProgressView mCircleProgressView;
-    private TextView progressText;
     private FloatingActionButton fab;
 
     private ListView listOfGoals;
@@ -83,7 +76,6 @@ public class HomePage extends AppCompatActivity {
 
 
         //TODO get date from test mode
-        testModeText = (TextView) findViewById(R.id.txt_test_mode_active);
         checkTestMode();
 
         try {
@@ -99,27 +91,20 @@ public class HomePage extends AppCompatActivity {
 
         setUpTabs();
 
-        progressBarText = (TextView) findViewById(R.id.txt_progress_view);
-        dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
         mCircleProgressView = (CircleProgressView) findViewById(R.id.circle_progress_view);
         mCircleProgressView.setInterpolator(new AccelerateDecelerateInterpolator());
         mCircleProgressView.setStartAngle(-90);
 
 
-        progressText = (TextView) findViewById(R.id.txt_goalprogress);
-
         // Goals List View
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
-        goalListAdapter = new GoalListAdapter(this, goalList);
-        listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
         listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
-
         listOfHistory = (ListView) findViewById(R.id.list_history);
         listOfHistory.setFocusable(false);
 
         // Clicking progressBar
-        circleListener = new CircleProgressOnClickListener(getFragmentManager(), currentGoal);
+        CircleProgressOnClickListener circleListener = new CircleProgressOnClickListener(getFragmentManager(), currentGoal);
         mCircleProgressView.setOnClickListener(circleListener);
 
         // ToolBar
@@ -143,7 +128,7 @@ public class HomePage extends AppCompatActivity {
         DrawerItemSelectedListener navListener = new DrawerItemSelectedListener(this, goalDAO, drawer);
         navigationView.setNavigationItemSelectedListener(navListener);
 
-        updateHomePage();
+        updateUI();
 
     }
 
@@ -264,10 +249,7 @@ public class HomePage extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            return true;
-        } else if(id == R.id.make_history) {
+        if(id == R.id.make_history) {
             Random r = new Random();
 
             for(int i = 0; i < 15; i++){
@@ -292,6 +274,9 @@ public class HomePage extends AppCompatActivity {
 
     public void updateCurrentGoal(){
         // Goal name heading
+        TextView dailyGoalName = (TextView) findViewById(R.id.currentGoalName);
+        TextView progressBarText = (TextView) findViewById(R.id.txt_progress_view);
+        TextView progressText = (TextView) findViewById(R.id.txt_goalprogress);
         if(currentGoal != null){
             dailyGoalName.setText(currentGoal.getName());
 
@@ -311,17 +296,28 @@ public class HomePage extends AppCompatActivity {
     private void checkTestMode(){
         boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
 
+        TextView testModeText = (TextView) findViewById(R.id.txt_test_mode_active);
+        TextView testModeHistory = (TextView) findViewById(R.id.txt_test_mode_active_history);
+
         if(testMode){
             today = new Date(System.currentTimeMillis());
             SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
             testModeText.setText("TEST MODE (" + df.format(today) + ")");
             testModeText.setVisibility(View.VISIBLE);
+            testModeHistory.setText("TEST MODE (" + df.format(today) + ")");
+            testModeHistory.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Test Mode Active ", Toast.LENGTH_SHORT).show();
         } else {
             today = new Date(System.currentTimeMillis());
             testModeText.setVisibility(View.INVISIBLE);
+            testModeHistory.setVisibility(View.INVISIBLE);
             Toast.makeText(this, "Normal Mode Active", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void updateUI(){
+        updateHomePage();
+        updateHistoryList();
     }
 
     public void updateGoalList(){

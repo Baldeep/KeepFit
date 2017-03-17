@@ -62,16 +62,34 @@
                                 android:layout_height="match_parent"
                                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                                 android:layout_marginRight="@dimen/activity_horizontal_margin"
+                                android:layout_marginTop="@dimen/activity_vertical_margin"
                                 android:orientation="vertical">
 
-
-                                <TextView
+                                <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/activity_horizontal_margin"
-                                    android:text="Your Goal History: "
-                                    android:textColor="@color/colorPrimaryText"
-                                    android:textSize="@dimen/text_h2" />
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:text="@string/your_goal_history"
+                                        android:textSize="@dimen/text_h2"
+                                        android:textColor="@android:color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/historyHeading"/>
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@android:color/holo_red_light"
+                                        android:textSize="@dimen/text_h3"
+                                        android:visibility="invisible"
+                                        android:text="TEST MODE"
+                                        android:textAlignment="viewEnd"
+                                        android:id="@+id/txt_test_mode_active_history"/>
+
+                                </LinearLayout>
+
 
                                 <View
                                     android:layout_width="fill_parent"
