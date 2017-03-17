@@ -17,9 +17,8 @@ import java.sql.SQLException;
 
 import cs551.baldeep.constants.Constants;
 import cs551.baldeep.dao.GoalDAO;
-import cs551.baldeep.dialogs.ConfirmDialog;
+import cs551.baldeep.dialogs.DeleteGoalDialog;
 import cs551.baldeep.models.Goal;
-import cs551.baldeep.utils.GoalUtils;
 import cs551.baldeep.utils.Units;
 
 /**
@@ -137,7 +136,7 @@ public class AddGoalPage extends AppCompatActivity {
                 public void onClick(View v) {
                     Toast.makeText(getApplicationContext(), "Clicked delete", Toast.LENGTH_SHORT);
 
-                    DialogFragment confirm = new ConfirmDialog();
+                    DialogFragment confirm = new DeleteGoalDialog();
                     Bundle confirmBundle = new Bundle();
                     confirmBundle.putString(Constants.GOAL_ID, getIntent().getStringExtra(Constants.GOAL_ID));
                     confirm.setArguments(confirmBundle);

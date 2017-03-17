@@ -43,12 +43,11 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_dialog_alert"
+            android:src="@drawable/btn_star_big_off"
             android:layout_weight="0"
             android:paddingRight="5dp"
             android:layout_gravity="center"
-            android:tint="@android:color/holo_orange_light"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:id="@+id/image_row_completed_icon"/>
 
     </LinearLayout>

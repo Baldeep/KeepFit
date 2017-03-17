@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
@@ -141,6 +143,8 @@ public class GoalDAO {
             Where where = queryBuilder.where();
             where.eq(Goal.GOAL_DONE, true);
 
+            queryBuilder.orderBy(Goal.GOAL_DATE, false);
+
             PreparedQuery<Goal> query = queryBuilder.prepare();
             return goalDAO.query(query);
 
@@ -149,4 +153,22 @@ public class GoalDAO {
             return new ArrayList<Goal>();
         }
     }
+
+    public boolean deleteAllFinished() {
+        try{
+            DeleteBuilder<Goal, String> deleteBuilder = goalDAO.deleteBuilder();
+
+            Where where = deleteBuilder.where();
+            where.eq(Goal.GOAL_DONE, true);
+
+
+            PreparedDelete<Goal> query = deleteBuilder.prepare();
+
+            goalDAO.delete(query);
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }    }
 }

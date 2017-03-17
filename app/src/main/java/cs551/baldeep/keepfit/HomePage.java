@@ -15,11 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,11 +26,12 @@ import com.eralp.circleprogressview.CircleProgressView;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
-import cs551.baldeep.adapters.ActivityListAdapter;
+import cs551.baldeep.adapters.HistoryListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.constants.Constants;
 import cs551.baldeep.listeners.CircleProgressOnClickListener;
@@ -53,19 +52,21 @@ public class HomePage extends AppCompatActivity {
     private Goal currentGoal;
     private List<Goal> goalList;
 
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
+
 
     protected DrawerLayout drawer;
 
+    private TextView testModeText;
     private TextView dailyGoalName;
     private TextView progressBarText;
-    CircleProgressOnClickListener circleListener;
+    private CircleProgressOnClickListener circleListener;
     private CircleProgressView mCircleProgressView;
     private TextView progressText;
     private FloatingActionButton fab;
 
     private ListView listOfGoals;
-    ListAdapter goalListAdapter;
+    private ListAdapter goalListAdapter;
     private GoalListEditItemOnClickListener listOfGoalsItemClickListener;
     private ListView listOfHistory;
 
@@ -78,15 +79,12 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
-        //TODO get date from test mode
-        today = new Date(System.currentTimeMillis());
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean testMode = sharedPreferences.getBoolean("test_mode",false);
 
-        if(testMode){
-            Toast.makeText(this, "Test Mode Active", Toast.LENGTH_SHORT).show();
-        }
+
+        //TODO get date from test mode
+        testModeText = (TextView) findViewById(R.id.txt_test_mode_active);
+        checkTestMode();
 
         try {
             goalDAO = new GoalDAO(getApplicationContext());
@@ -111,38 +109,14 @@ public class HomePage extends AppCompatActivity {
         progressText = (TextView) findViewById(R.id.txt_goalprogress);
 
         // Goals List View
-        if(goalList.size()>0){
-            TextView listReplacementText = (TextView) findViewById(R.id.txt_no_goals_list_replacement);
-            listReplacementText.setVisibility(View.GONE);
-        }
-
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
         goalListAdapter = new GoalListAdapter(this, goalList);
         listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
         listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
 
-        List<Goal> doneGoals = new ArrayList<Goal>();
-        Random r = new Random();
-
-        for(int i = 0; i < 7; i++){
-            Goal g = new Goal("Goal " + i, i * 1000, Units.STEPS);
-            g.setGoalUUID("oldgoals-" + i);
-            g.setDateOfGoal(new Date(System.currentTimeMillis() - (86400002 * i)));
-            g.setGoalCompleted(r.nextInt((i * 1000)+ 500));
-            g.setDone(true);
-            goalDAO.saveOrUpdate(g);
-            doneGoals.add(g);
-        }
-
-        List<Goal> goalsFinished = goalDAO.findAllFinished();
         listOfHistory = (ListView) findViewById(R.id.list_history);
-        ListAdapter historyAdapter = new ActivityListAdapter(this,goalsFinished);
-        listOfHistory.setAdapter(historyAdapter);
         listOfHistory.setFocusable(false);
-        UIUtils.setListViewHeightBasedOnItems(listOfHistory);
-
-
 
         // Clicking progressBar
         circleListener = new CircleProgressOnClickListener(getFragmentManager(), currentGoal);
@@ -225,12 +199,9 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean testMode = sharedPreferences.getBoolean("test_mode",false);
-
-        if(testMode){
-            Toast.makeText(this, "Test Mode Active", Toast.LENGTH_SHORT).show();
-        }
+        checkTestMode();
         updateHomePage();
+        updateHistoryList();
     }
 
     private void setUpTabs(){
@@ -294,7 +265,21 @@ public class HomePage extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
             return true;
+        } else if(id == R.id.make_history) {
+            Random r = new Random();
+
+            for(int i = 0; i < 15; i++){
+                Goal g = new Goal("Goal " + i, i * 1000, Units.STEPS);
+                g.setGoalUUID(UUID.randomUUID().toString());
+                g.setDateOfGoal(new Date(System.currentTimeMillis() - (86400002 * (i * 2))));
+                g.setGoalCompleted(r.nextInt((i * 1000)+ 500));
+                g.setDone(true);
+                goalDAO.saveOrUpdate(g);
+            }
+
+            updateHistoryList();
         }
 
         return super.onOptionsItemSelected(item);
@@ -323,11 +308,42 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
+    private void checkTestMode(){
+        boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
+
+        if(testMode){
+            today = new Date(System.currentTimeMillis());
+            SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
+            testModeText.setText("TEST MODE (" + df.format(today) + ")");
+            testModeText.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Test Mode Active ", Toast.LENGTH_SHORT).show();
+        } else {
+            today = new Date(System.currentTimeMillis());
+            testModeText.setVisibility(View.INVISIBLE);
+            Toast.makeText(this, "Normal Mode Active", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void updateGoalList(){
-        // Goals List
         goalList = goalDAO.findAllNotCurrentNotFinished();
+
+        TextView listReplacementText = (TextView) findViewById(R.id.txt_no_goals_list_replacement);
+        if(goalList.size()>0){
+            listReplacementText.setVisibility(View.GONE);
+        } else {
+            listReplacementText.setVisibility(View.VISIBLE);
+        }
+
         ListAdapter goalListAdapter = new GoalListAdapter(this, goalList);
         listOfGoals.setAdapter(goalListAdapter);
+    }
+
+    public void updateHistoryList(){
+        // Goals List
+        List<Goal> goalsFinished = goalDAO.findAllFinished();
+        ListAdapter historyAdapter = new HistoryListAdapter(this,goalsFinished);
+        listOfHistory.setAdapter(historyAdapter);
+        UIUtils.setListViewHeightBasedOnItems(listOfHistory);
     }
 
 }

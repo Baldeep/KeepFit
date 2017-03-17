@@ -1,11 +1,9 @@
 package cs551.baldeep.dialogs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,33 +12,28 @@ import java.sql.SQLException;
 
 import cs551.baldeep.constants.Constants;
 import cs551.baldeep.dao.GoalDAO;
-import cs551.baldeep.keepfit.AddGoalPage;
+import cs551.baldeep.keepfit.R;
 
 /**
  * Created by balde on 13/02/2017.
  */
 
-public class ConfirmDialog extends DialogFragment{
-
-    /*protected boolean confirmed = false;
-
-    public boolean showConfirmDialog(final Activity activity){*/
-
+public class DeleteHistoryDialog extends DialogFragment{
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AlertDialog.Builder confirmDialog = new AlertDialog.Builder(getActivity());
 
-        confirmDialog.setTitle("Delete Goal");
-        confirmDialog.setMessage("Are you sure you want to delete this goal?");
+        confirmDialog.setTitle("Delete History");
+        confirmDialog.setMessage("Are you sure you want to delete this your history?");
+        confirmDialog.setIcon(R.drawable.ic_dialog_alert);
         confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 try {
                     GoalDAO goalDAO = new GoalDAO(getActivity().getApplicationContext());
-                    Log.d("Confirm", getArguments().getString(Constants.GOAL_ID));
-                    goalDAO.deleteById(getArguments().getString(Constants.GOAL_ID));
-                    getActivity().finish();
+                    goalDAO.deleteAllFinished();
+                    Toast.makeText(getActivity().getApplicationContext(), "Cleared History", Toast.LENGTH_LONG).show();
                     dismiss();
 
                 } catch (SQLException e) {
@@ -49,7 +42,12 @@ public class ConfirmDialog extends DialogFragment{
 
             }
         });
-        confirmDialog.setNegativeButton("No", null);
+        confirmDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
         return confirmDialog.create();
     }
 }

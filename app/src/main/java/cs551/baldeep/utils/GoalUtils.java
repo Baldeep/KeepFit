@@ -62,4 +62,28 @@ public class GoalUtils {
 
         return formatted;
     }
+
+    public static String getFormattedProgressStringInUnits(Goal g, String units){
+        String formatted = "";
+
+        double tempSteps = Units.getUnitsInSteps(g.getGoalUnits(), g.getGoalCompleted());
+        double convertedProgress = Units.getStepsInUnits(units, tempSteps);
+
+        tempSteps = Units.getUnitsInSteps(g.getGoalUnits(), g.getGoalValue());
+        double convertedValue = Units.getStepsInUnits(units, tempSteps);
+
+        if(units.equals(Units.STEPS)){
+            DecimalFormat df = new DecimalFormat("0");
+            formatted += df.format((int)convertedProgress + "/" + (int)convertedProgress
+                    + " " + units);
+        } else {
+            DecimalFormat df = new DecimalFormat("#.000");
+            formatted += df.format(convertedProgress) + "/" + df.format(convertedValue)
+                    + " " + units;
+        }
+
+        return formatted;
+    }
+
+
 }

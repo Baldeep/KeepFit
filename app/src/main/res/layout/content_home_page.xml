@@ -145,6 +145,7 @@
                                             android:layout_height="wrap_content"
                                             android:textColor="@android:color/holo_red_light"
                                             android:textSize="@dimen/text_h3"
+                                            android:visibility="invisible"
                                             android:text="TEST MODE"
                                             android:textAlignment="viewEnd"
                                             android:id="@+id/txt_test_mode_active"/>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dateFormatsNames">
+        <item>US - mm/dd/yy</item>
+        <item>UK - dd/mm/yy</item>
+    </string-array>
+
+    <string-array name="dateFormats">
+        <item>MM/dd/yy</item>
+        <item>dd/MM/yy</item>
+    </string-array>
+
+
+</resources>

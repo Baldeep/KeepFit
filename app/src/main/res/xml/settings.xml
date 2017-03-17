@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:title="Test Mode"
-        android:key="test_mode" />
 
-    <PreferenceCategory android:title="Database Settings">
 
+    <PreferenceCategory android:title="Test Mode Settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="Test Mode"
+            android:key="test_mode" />
+
+        <ListPreference android:title="Date Format"
+            android:summary="Select the format of the date in test mode"
+            android:key="dateFormats"
+            android:defaultValue="1"
+            android:entries="@array/dateFormatsNames"
+            android:entryValues="@array/dateFormats" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Data Settings">
         <Preference android:title="Clear Goals"
-            android:key="@+id/clear_db_goals"
+            android:key="clear_db_goals"
             android:summary="Remove all goals"/>
 
         <Preference android:title="Clear History"
-            android:key="@+id/clear_db_history"
+            android:key="clear_db_history"
             android:summary="Removes past goals"/>
     </PreferenceCategory>
+
 </PreferenceScreen>

@@ -24,9 +24,9 @@ import cs551.baldeep.utils.Units;
  * Created by balde on 11/02/2017.
  */
 
-public class ActivityListAdapter extends ArrayAdapter<Goal> {
+public class HistoryListAdapter extends ArrayAdapter<Goal> {
 
-    public ActivityListAdapter(Context context, List<Goal> history) {
+    public HistoryListAdapter(Context context, List<Goal> history) {
         super(context, R.layout.history_list_row_layout, history);
     }
 
@@ -60,7 +60,7 @@ public class ActivityListAdapter extends ArrayAdapter<Goal> {
                     + " " + g.getGoalUnits());
         }
         if(g.getPercentageCompleted() >= 100){
-            imageView.setVisibility(View.VISIBLE);
+            imageView.setImageResource(R.drawable.btn_star_big_on_pressed);;
         }
 
 

@@ -30,5 +30,6 @@ public class Constants {
 
 
     public static final String TEST_MODE = "test_mode";
+    public static final String DATE_FORMAT = "dateFormats";
 
 }
