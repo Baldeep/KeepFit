@@ -5,12 +5,10 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.sql.SQLException;
 
-import cs551.baldeep.constants.Constants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.keepfit.R;
 
@@ -18,22 +16,23 @@ import cs551.baldeep.keepfit.R;
  * Created by balde on 13/02/2017.
  */
 
-public class DeleteHistoryDialog extends DialogFragment{
+public class DeleteAllGoalsDialog extends DialogFragment{
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AlertDialog.Builder confirmDialog = new AlertDialog.Builder(getActivity());
 
-        confirmDialog.setTitle("Delete History");
-        confirmDialog.setMessage("Are you sure you want to delete all your history?");
+        confirmDialog.setTitle("Delete Goals");
+        confirmDialog.setMessage("Are you sure you want to delete all goals? \n This includes your " +
+                        " history, your current goal and any other goals you may have created");
         confirmDialog.setIcon(R.drawable.ic_dialog_alert);
         confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 try {
                     GoalDAO goalDAO = new GoalDAO(getActivity().getApplicationContext());
-                    goalDAO.deleteAllFinished();
-                    Toast.makeText(getActivity().getApplicationContext(), "Cleared History", Toast.LENGTH_LONG).show();
+                    goalDAO.deleteAll();
+                    Toast.makeText(getActivity().getApplicationContext(), "Deleted All Goals", Toast.LENGTH_LONG).show();
                     dismiss();
 
                 } catch (SQLException e) {

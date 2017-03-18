@@ -8,6 +8,7 @@
     <string name="your_daily_goal_heading">Your Daily Goal:</string>
     <string name="no_goal_message">No goal set for today!</string>
     <string name="your_goals_heading">Your Goals:</string>
-    <string name="no_goals_have_been_created_yet">No goals have been created yet!</string>
+    <string name="no_goals_have_been_created_yet">No goals to show :( \n Create more goals!</string>
     <string name="your_goal_history">Your Goal History</string>
+    <string name="no_history_to_show">No history to show :(</string>
 </resources>

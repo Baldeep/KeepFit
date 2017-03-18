@@ -2,8 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/make_history"
-        android:title="Make History"
-        android:orderInCategory="101"
-        app:showAsAction="never" />
+    <group android:id="@+id/overflow_menu_test_options">
+
+        <item android:id="@+id/menu_make_history"
+            android:title="Make Hardcoded History"
+            android:orderInCategory="101"
+            app:showAsAction="never" />
+
+        <item android:id="@+id/menu_set_date"
+            android:title="Set Date"
+            android:orderInCategory="101"
+            app:showAsAction="never" />
+
+        <item android:id="@+id/menu_end_day"
+            android:title="End Day"
+            android:orderInCategory="101"
+            app:showAsAction="never" />
+
+    </group>
+
 </menu>

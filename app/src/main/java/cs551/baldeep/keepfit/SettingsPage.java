@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.sql.SQLException;
 
 import cs551.baldeep.dao.GoalDAO;
+import cs551.baldeep.listeners.DeleteAllGoalsPreferenceOnClickListener;
 import cs551.baldeep.listeners.DeleteHistoryPreferenceOnClickListener;
 
 
@@ -60,7 +61,10 @@ public class SettingsPage extends AppCompatActivity {
             }
 
             Preference clearHistory = (Preference) findPreference("clear_db_history");
-            clearHistory.setOnPreferenceClickListener(new DeleteHistoryPreferenceOnClickListener(getFragmentManager(), goalDAO));
+            clearHistory.setOnPreferenceClickListener(new DeleteHistoryPreferenceOnClickListener(getFragmentManager()));
+
+            Preference clearAllData = (Preference) findPreference("clear_all_data");
+            clearAllData.setOnPreferenceClickListener(new DeleteAllGoalsPreferenceOnClickListener(getFragmentManager()));
         }
     }
 }

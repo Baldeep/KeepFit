@@ -1,7 +1,5 @@
 package cs551.baldeep.models;
 
-import android.util.Log;
-
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -25,7 +23,7 @@ public class Goal {
 
     public static String GOAL_VALUE = "goal_value";
     @DatabaseField(columnName = "goal_value")
-    private double goalValue;
+    private double goalTarget;
 
     public static String GOAL_COMPLETED = "goal_completed_value";
     @DatabaseField(columnName = "goal_completed_value")
@@ -52,10 +50,10 @@ public class Goal {
     private boolean done;
 
 
-    public Goal(String name, double goalValue, String goalUnits) {
+    public Goal(String name, double goalTarget, String goalUnits) {
         this.goalUUID = UUID.randomUUID().toString();
         this.name = name;
-        this.goalValue = goalValue;
+        this.goalTarget = goalTarget;
         this.goalCompleted = 0;
         this.goalUnits = goalUnits;
         this.currentGoal = false;
@@ -80,12 +78,12 @@ public class Goal {
         this.name = name;
     }
 
-    public double getGoalValue() {
-        return goalValue;
+    public double getGoalTarget() {
+        return goalTarget;
     }
 
-    public void setGoalValue(double goalValue) {
-        this.goalValue = goalValue;
+    public void setGoalTarget(double goalTarget) {
+        this.goalTarget = goalTarget;
     }
 
     public double getGoalCompleted() {
@@ -94,7 +92,7 @@ public class Goal {
 
     public void setGoalCompleted(double goalCompleted) {
         this.goalCompleted = goalCompleted;
-        this.percentageCompleted = (int) ((goalCompleted/goalValue)*100);
+        this.percentageCompleted = (int) ((goalCompleted/ goalTarget)*100);
     }
 
     public String getGoalUnits() {
@@ -130,14 +128,14 @@ public class Goal {
     }
 
     public int getPercentageCompleted() {
-        this.percentageCompleted = (int) ((goalCompleted/goalValue)*100);
+        this.percentageCompleted = (int) ((goalCompleted/ goalTarget)*100);
         return percentageCompleted;
     }
 
     public void setPercentageCompleted(int percentageCompleted) {
         this.percentageCompleted = percentageCompleted;
         if(percentageCompleted<=100){
-            goalCompleted = (goalValue/percentageCompleted)*100;
+            goalCompleted = (goalTarget /percentageCompleted)*100;
         }
     }
 }

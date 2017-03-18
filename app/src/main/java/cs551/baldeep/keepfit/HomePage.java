@@ -28,8 +28,6 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import cs551.baldeep.adapters.HistoryListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
@@ -40,6 +38,7 @@ import cs551.baldeep.listeners.FABOnClickListener;
 import cs551.baldeep.listeners.GoalListEditItemOnClickListener;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
+import cs551.baldeep.utils.AlarmUtils;
 import cs551.baldeep.utils.GoalUtils;
 import cs551.baldeep.utils.UIUtils;
 import cs551.baldeep.utils.Units;
@@ -59,11 +58,10 @@ public class HomePage extends AppCompatActivity {
     private FloatingActionButton fab;
 
     private ListView listOfGoals;
-    private ListAdapter goalListAdapter;
-    private GoalListEditItemOnClickListener listOfGoalsItemClickListener;
     private ListView listOfHistory;
 
     private GoalDAO goalDAO;
+    private GoalUtils goalUtils;
 
     private Date today;
 
@@ -71,13 +69,10 @@ public class HomePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
-
+        today = new Date(System.currentTimeMillis());
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-
-        //TODO get date from test mode
-        checkTestMode();
-
+        goalUtils = new GoalUtils(getApplicationContext());
         try {
             goalDAO = new GoalDAO(getApplicationContext());
         } catch (SQLException e) {
@@ -86,8 +81,14 @@ public class HomePage extends AppCompatActivity {
             ueh.uncaughtException(Thread.currentThread(), e);
         }
 
+        //TODO get date from test mode
+        checkTestMode();
+
         goalList = goalDAO.findAll();
         currentGoal = goalDAO.findCurrentGoal();
+        if(currentGoal != null) {
+            currentGoal.setDateOfGoal(today);
+        }
 
         setUpTabs();
 
@@ -99,12 +100,13 @@ public class HomePage extends AppCompatActivity {
         // Goals List View
         listOfGoals = (ListView) findViewById(R.id.listview_goals);
         listOfGoals.setFocusable(false);
+        GoalListEditItemOnClickListener listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
         listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
         listOfHistory = (ListView) findViewById(R.id.list_history);
         listOfHistory.setFocusable(false);
 
         // Clicking progressBar
-        CircleProgressOnClickListener circleListener = new CircleProgressOnClickListener(getFragmentManager(), currentGoal);
+        CircleProgressOnClickListener circleListener = new CircleProgressOnClickListener(getFragmentManager(), goalDAO);
         mCircleProgressView.setOnClickListener(circleListener);
 
         // ToolBar
@@ -130,9 +132,8 @@ public class HomePage extends AppCompatActivity {
 
         updateUI();
 
+        AlarmUtils.setUpAlarm(getApplicationContext());
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -178,15 +179,25 @@ public class HomePage extends AppCompatActivity {
             updateHomePage();
         } else if(resultCode == RESULT_SETTINGS){
 
+        } else if(resultCode == 3){
+            Log.i("HOME *** ", "Got result from add - " + data.getStringExtra("A"));
         }
     }
 
     @Override
+    protected void onPause() {
+        // Don't save the current goal here, since a dialog might have changed it, without changing
+        // the current goal in the HomePage.java
+        super.onPause();
+    }
+
+    @Override
     protected void onResume() {
-        super.onResume();
+        Log.i("HOME ***", "RESUMING");
+        currentGoal = goalDAO.findCurrentGoal();
         checkTestMode();
-        updateHomePage();
-        updateHistoryList();
+        updateUI();
+        super.onResume();
     }
 
     private void setUpTabs(){
@@ -242,6 +253,19 @@ public class HomePage extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
+
+        if (testMode) {
+            menu.setGroupVisible(R.id.overflow_menu_test_options, true);
+        } else {
+            menu.setGroupVisible(R.id.overflow_menu_test_options, false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -249,8 +273,8 @@ public class HomePage extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if(id == R.id.make_history) {
-            Random r = new Random();
+        if(id == R.id.menu_make_history) {
+            /*Random r = new Random();
 
             for(int i = 0; i < 15; i++){
                 Goal g = new Goal("Goal " + i, i * 1000, Units.STEPS);
@@ -261,7 +285,13 @@ public class HomePage extends AppCompatActivity {
                 goalDAO.saveOrUpdate(g);
             }
 
-            updateHistoryList();
+            updateHistoryList();*/
+        }
+
+        if(id == R.id.menu_end_day){
+            goalUtils.endOfDay();
+            currentGoal = goalDAO.findCurrentGoal();
+            updateUI();
         }
 
         return super.onOptionsItemSelected(item);
@@ -283,7 +313,7 @@ public class HomePage extends AppCompatActivity {
             progressBarText.setText("Add\nActivity");
             mCircleProgressView.setProgress(currentGoal.getPercentageCompleted());
 
-            progressText.setText(GoalUtils.getFormattedProgressString(currentGoal));
+            progressText.setText(goalUtils.getFormattedProgressString(currentGoal));
         } else {
             dailyGoalName.setText(R.string.no_goal_message);
 
@@ -293,31 +323,19 @@ public class HomePage extends AppCompatActivity {
         }
     }
 
-    private void checkTestMode(){
-        boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
-
-        TextView testModeText = (TextView) findViewById(R.id.txt_test_mode_active);
-        TextView testModeHistory = (TextView) findViewById(R.id.txt_test_mode_active_history);
-
-        if(testMode){
-            today = new Date(System.currentTimeMillis());
-            SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
-            testModeText.setText("TEST MODE (" + df.format(today) + ")");
-            testModeText.setVisibility(View.VISIBLE);
-            testModeHistory.setText("TEST MODE (" + df.format(today) + ")");
-            testModeHistory.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Test Mode Active ", Toast.LENGTH_SHORT).show();
-        } else {
-            today = new Date(System.currentTimeMillis());
-            testModeText.setVisibility(View.INVISIBLE);
-            testModeHistory.setVisibility(View.INVISIBLE);
-            Toast.makeText(this, "Normal Mode Active", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void updateUI(){
+        Log.i("Home Page", "Updating UI");
         updateHomePage();
         updateHistoryList();
+
+        /*List<Goal> goals = goalDAO.findAll();
+        for(Goal g : goals){
+            String spacer = "";
+            for(int i = g.getName().length(); i < 25; i++){
+                spacer += " ";
+            }
+            Log.i("HOMEPAGE - 336: ", g.getName() + spacer + " - " + g.getGoalCompleted() + "/" + g.getGoalTarget() + " " + g.getGoalUnits() + ", current: " + g.isCurrentGoal() + ", done: " + g.isDone() + ", date: " + g.getDateOfGoal());
+        }*/
     }
 
     public void updateGoalList(){
@@ -337,9 +355,41 @@ public class HomePage extends AppCompatActivity {
     public void updateHistoryList(){
         // Goals List
         List<Goal> goalsFinished = goalDAO.findAllFinished();
+
+        TextView listReplacementText = (TextView) findViewById(R.id.txt_no_history_list_replacement);
+        if(goalsFinished.size()>0){
+            listReplacementText.setVisibility(View.GONE);
+        } else {
+            listReplacementText.setVisibility(View.VISIBLE);
+        }
+
         ListAdapter historyAdapter = new HistoryListAdapter(this,goalsFinished);
         listOfHistory.setAdapter(historyAdapter);
         UIUtils.setListViewHeightBasedOnItems(listOfHistory);
+    }
+
+    private void checkTestMode(){
+        boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
+
+        TextView testModeText = (TextView) findViewById(R.id.txt_test_mode_active);
+        TextView testModeHistory = (TextView) findViewById(R.id.txt_test_mode_active_history);
+
+        // Refreshes the overflow menu
+        invalidateOptionsMenu();
+
+        if(testMode){
+            today = new Date(System.currentTimeMillis());
+            SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
+            testModeText.setText("TEST MODE (" + df.format(today) + ")");
+            testModeText.setVisibility(View.VISIBLE);
+            testModeHistory.setText("TEST MODE (" + df.format(today) + ")");
+            testModeHistory.setVisibility(View.VISIBLE);
+        } else {
+            today = new Date(System.currentTimeMillis());
+            testModeText.setVisibility(View.INVISIBLE);
+            testModeHistory.setVisibility(View.INVISIBLE);
+
+        }
     }
 
 }

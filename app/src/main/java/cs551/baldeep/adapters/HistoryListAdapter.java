@@ -2,7 +2,6 @@ package cs551.baldeep.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -52,11 +49,11 @@ public class HistoryListAdapter extends ArrayAdapter<Goal> {
         goalName.setText(g.getName());
         if(g.getGoalUnits().equals(Units.STEPS)) {
             activityValue.setText((int) getItem(position).getGoalCompleted()
-                    + "/" + (int) getItem(position).getGoalValue()
+                    + "/" + (int) getItem(position).getGoalTarget()
                     + " " + g.getGoalUnits());
         } else {
             activityValue.setText(getItem(position).getGoalCompleted()
-                    + "/" + getItem(position).getGoalValue()
+                    + "/" + getItem(position).getGoalTarget()
                     + " " + g.getGoalUnits());
         }
         if(g.getPercentageCompleted() >= 100){

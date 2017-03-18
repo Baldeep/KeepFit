@@ -2,23 +2,20 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/nav_home"
-        android:icon="@android:drawable/stat_sys_warning"
-        android:title="Home"
-        />
+    <!--
     <group android:checkableBehavior="single">
 
-    </group>
+    </group> -->
+    <item
+        android:id="@+id/nav_view_home"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:title="Home"
+        />
+
     <item
         android:id="@+id/nav_settings"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Settings" />
-    <item
-        android:id="@+id/nav_deleteall"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="Delete All Goals" />
-
 
     <!--<item android:title="Communicate">
         <menu>

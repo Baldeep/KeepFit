@@ -13,6 +13,7 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cs551.baldeep.models.Goal;
@@ -93,28 +94,11 @@ public class GoalDAO {
 
             Where<Goal, String> where = queryBuilder.where();
             where.eq(Goal.CURRENT_GOAL, true);
+            queryBuilder.orderBy(Goal.GOAL_DATE, false);
 
             PreparedQuery<Goal> query = queryBuilder.prepare();
             List<Goal> goals = goalDAO.query(query);
-            if(goals.size() > 1){
-                Log.i("GoalDAO", "Multiple Current Goals found, returning newest, resetting others.");
-                Goal newest = goals.get(0);
-
-                for(int i = 1; i < goals.size(); i++){
-                    if(goals.get(i).getDateOfGoal().before(newest.getDateOfGoal())){
-                        newest = goals.get(i);
-                        Log.d("GoalDAO", "Newest is: " + newest.getName() + " on " + newest.getDateOfGoal().toString());
-                    }
-                }
-
-                goals.remove(newest);
-                for(int i = 0; i < goals.size(); i++){
-                    goals.get(i).setCurrentGoal(false);
-                    saveOrUpdate(goals.get(i));
-                }
-
-                return newest;
-            } else if(goals.size() == 1){
+            if(goals.size() >= 1){
                 return goals.get(0);
             } else {
                 return null;
@@ -154,6 +138,31 @@ public class GoalDAO {
         }
     }
 
+    public Goal findFinishedForDate(Date date){
+        try{
+            QueryBuilder<Goal, String> queryBuilder = goalDAO.queryBuilder();
+
+            Where where = queryBuilder.where();
+            where.eq(Goal.GOAL_DONE, true);
+            where.and();
+            where.eq(Goal.GOAL_DATE, date);
+
+            queryBuilder.orderBy(Goal.GOAL_DATE, false);
+
+            PreparedQuery<Goal> query = queryBuilder.prepare();
+
+            List<Goal> results = goalDAO.query(query);
+            if(results.size() > 0){
+                return results.get(1);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean deleteAllFinished() {
         try{
             DeleteBuilder<Goal, String> deleteBuilder = goalDAO.deleteBuilder();
@@ -170,5 +179,6 @@ public class GoalDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
-        }    }
+        }
+    }
 }

@@ -98,6 +98,17 @@
                                     android:layout_centerVertical="true"
                                     android:background="@color/colorDivider" />
 
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/text_h1"
+                                    android:textColor="@android:color/black"
+                                    android:textAlignment="center"
+                                    android:text="@string/no_history_to_show"
+                                    android:layout_marginTop="20dp"
+                                    android:id="@+id/txt_no_history_list_replacement"/>
+
+
                                 <ListView
                                     android:id="@+id/list_history"
                                     android:layout_width="match_parent"
@@ -282,7 +293,8 @@
                                 android:textSize="@dimen/text_h1"
                                 android:textColor="@android:color/black"
                                 android:text="@string/no_goals_have_been_created_yet"
-                                android:layout_marginTop="5dp"
+                                android:layout_marginTop="20dp"
+                                android:textAlignment="center"
                                 android:id="@+id/txt_no_goals_list_replacement"/>
 
                             <ListView

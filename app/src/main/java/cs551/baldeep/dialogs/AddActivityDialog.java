@@ -2,8 +2,8 @@ package cs551.baldeep.dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -30,11 +30,12 @@ public class AddActivityDialog extends DialogFragment{
 
     protected String goalUUID;
 
+    protected GoalDAO goalDAO;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GoalDAO goalDAO = null;
         try {
             goalDAO = new GoalDAO(getActivity().getApplicationContext());
         } catch (SQLException e) {
@@ -42,18 +43,17 @@ public class AddActivityDialog extends DialogFragment{
         }
 
         goalUUID = getArguments().getString(Constants.GOAL_ID);
-        Goal goal = goalDAO.findById(goalUUID);
 
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View dialog_layout = inflater.inflate(R.layout.dialog_add_activity, null);
 
+
         Spinner addActivityUnitsSpinner = (Spinner) dialog_layout.findViewById(R.id.spinner_activity_entered_units);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getActivity(), android.R.layout.simple_spinner_item, Units.getUnitStrings());
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, Units.getUnitStrings());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         addActivityUnitsSpinner.setAdapter(adapter);
-        addActivityUnitsSpinner.setSelection(adapter.getPosition(goal.getGoalUnits()));
+        addActivityUnitsSpinner.setSelection(adapter.getPosition(goalDAO.findById(goalUUID).getGoalUnits()));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(dialog_layout);
@@ -65,29 +65,28 @@ public class AddActivityDialog extends DialogFragment{
                 EditText activity = (EditText) getDialog().findViewById(R.id.txt_activity_entered);
                 Spinner unitsSpinner = (Spinner) getDialog().findViewById(R.id.spinner_activity_entered_units);
 
-                String activityToAdd = String.valueOf(activity.getText());
-                if(activityToAdd.trim().isEmpty()){
-                    activityToAdd = "0";
+                String activityToAddString = String.valueOf(activity.getText());
+
+                double activityToAdd = 0.0;
+
+                if(!activityToAddString.trim().isEmpty()){
+                    activityToAdd = Double.valueOf(activityToAddString);
                 }
 
                 GoalUtils goalUtils = new GoalUtils(getActivity().getApplicationContext());
-                Goal currentGoal = goalUtils.addActivityToGoal(goalUUID,
-                        Double.valueOf(activityToAdd),
-                        unitsSpinner.getSelectedItem().toString());
+                Goal currentGoal = goalUtils.addActivityToGoal(goalUUID, activityToAdd, unitsSpinner.getSelectedItem().toString());
 
                 TextView progressText = (TextView) getActivity().findViewById(R.id.txt_goalprogress);
-                if(unitsSpinner.getSelectedItem().toString().equals(Units.STEPS)){
-                    progressText.setText((int)currentGoal.getGoalCompleted() + "/" + (int)currentGoal.getGoalValue()
-                            + " " + currentGoal.getGoalUnits());
-                } else {
-                    progressText.setText(currentGoal.getGoalCompleted() + "/" + currentGoal.getGoalValue()
-                            + " " + currentGoal.getGoalUnits());
-                }
+                progressText.setText(goalUtils.getFormattedProgressString(goalDAO.findById(goalUUID)));
 
                 CircleProgressView mCircleProgressView = (CircleProgressView) getActivity().findViewById(R.id.circle_progress_view);
                 mCircleProgressView.setProgress(currentGoal.getPercentageCompleted());
 
                 Toast.makeText(getActivity().getApplicationContext(), "Activity recorded", Toast.LENGTH_SHORT);
+
+               /* Intent i = new Intent();
+                i.putExtra("A", Constants.ADD);
+                (A).setResult(3, i);*/
                 //getTargetFragment().onActivityResult(getTargetRequestCode(), 0, getActivity().getIntent());
             }
         });

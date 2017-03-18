@@ -31,8 +31,8 @@ public class DrawerItemSelectedListener implements NavigationView.OnNavigationIt
             Intent settingsIntent = new Intent(activity, SettingsPage.class);
             activity.startActivity(settingsIntent);
 
-        } else if(item.getItemId() == R.id.nav_deleteall){
-            goalDAO.deleteAll();
+        } else if(item.getItemId() == R.id.nav_view_home){
+
         }
         return true;
     }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import cs551.baldeep.constants.Constants;
+import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.dialogs.AddActivityDialog;
 import cs551.baldeep.dialogs.InformationDialog;
 import cs551.baldeep.models.Goal;
@@ -18,16 +19,18 @@ import cs551.baldeep.models.Goal;
 public class CircleProgressOnClickListener implements View.OnClickListener {
 
     private FragmentManager fragmentManager;
-    private Goal currentGoal;
+    private GoalDAO goalDAO;
 
-    public CircleProgressOnClickListener(FragmentManager fragmentManager, Goal currentGoal){
+    public CircleProgressOnClickListener(FragmentManager fragmentManager, GoalDAO goalDAO){
         this.fragmentManager = fragmentManager;
-        this.currentGoal = currentGoal;
+        this.goalDAO = goalDAO;
     }
 
 
     @Override
     public void onClick(View v) {
+        Goal currentGoal = goalDAO.findCurrentGoal();
+
         if(currentGoal != null) {
             DialogFragment addActivityDialog = new AddActivityDialog();
             Bundle addActivityBundle = new Bundle();
@@ -46,14 +49,6 @@ public class CircleProgressOnClickListener implements View.OnClickListener {
             infoDialog.setArguments(infoBundle);
             infoDialog.show(fragmentManager, "Error");
         }
-    }
-
-    public void setCurrentGoal(Goal currentGoal){
-        this.currentGoal = currentGoal;
-    }
-
-    public Goal getCurrentGoal(){
-        return currentGoal;
     }
 
 }

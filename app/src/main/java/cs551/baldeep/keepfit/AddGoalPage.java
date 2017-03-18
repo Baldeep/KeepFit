@@ -72,7 +72,7 @@ public class AddGoalPage extends AppCompatActivity {
         if(getIntent().getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)){
             Goal goal = goalDAO.findById(getIntent().getStringExtra(Constants.GOAL_ID));
             goalNameTxt.setText(goal.getName());
-            goalValueTxt.setText(goal.getGoalValue()+"");
+            goalValueTxt.setText(goal.getGoalTarget()+"");
             if(goal.isCurrentGoal()){
                 setAsCurrentCheck.setChecked(true);
             }

@@ -15,7 +15,7 @@ fieldName=name
 columnName=name
 # --field-end--
 # --field-start--
-fieldName=goalValue
+fieldName=goalTarget
 columnName=goal_value
 # --field-end--
 # --field-start--
