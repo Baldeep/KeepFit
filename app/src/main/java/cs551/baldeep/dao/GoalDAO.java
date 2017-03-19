@@ -153,7 +153,7 @@ public class GoalDAO {
 
             List<Goal> results = goalDAO.query(query);
             if(results.size() > 0){
-                return results.get(1);
+                return results.get(0);
             } else {
                 return null;
             }

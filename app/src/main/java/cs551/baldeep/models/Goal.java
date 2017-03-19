@@ -3,6 +3,7 @@ package cs551.baldeep.models;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -116,7 +117,14 @@ public class Goal {
     }
 
     public void setDateOfGoal(Date dateOfGoal) {
-        this.dateOfGoal = dateOfGoal;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateOfGoal);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 1);
+        
+        this.dateOfGoal = calendar.getTime();
     }
 
     public boolean isDone() {

@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.preference.Preference;
 
+import cs551.baldeep.dialogs.DeleteAllGoalsDialog;
 import cs551.baldeep.dialogs.DeleteHistoryDialog;
 
 /**
@@ -20,7 +21,7 @@ public class DeleteAllGoalsPreferenceOnClickListener implements Preference.OnPre
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-        DialogFragment confirm = new DeleteHistoryDialog();
+        DialogFragment confirm = new DeleteAllGoalsDialog();
         confirm.show(fragmentManager , "Confirm Delete");
 
         return true;

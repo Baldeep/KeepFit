@@ -24,7 +24,7 @@ public class DeleteAllGoalsDialog extends DialogFragment{
         AlertDialog.Builder confirmDialog = new AlertDialog.Builder(getActivity());
 
         confirmDialog.setTitle("Delete Goals");
-        confirmDialog.setMessage("Are you sure you want to delete all goals? \n This includes your " +
+        confirmDialog.setMessage("Are you sure you want to delete all goals? \n\nThis includes your " +
                         " history, your current goal and any other goals you may have created");
         confirmDialog.setIcon(R.drawable.ic_dialog_alert);
         confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

@@ -25,6 +25,11 @@
         <Preference android:title="Clear History"
             android:key="clear_db_history"
             android:summary="Removes past goals"/>
+
+        <Preference android:title="Clear All Data"
+            android:key="clear_all_data"
+            android:summary="Removes all goals"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

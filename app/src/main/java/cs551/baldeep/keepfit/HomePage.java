@@ -81,7 +81,6 @@ public class HomePage extends AppCompatActivity {
             ueh.uncaughtException(Thread.currentThread(), e);
         }
 
-        //TODO get date from test mode
         checkTestMode();
 
         goalList = goalDAO.findAll();
@@ -195,7 +194,7 @@ public class HomePage extends AppCompatActivity {
     protected void onResume() {
         Log.i("HOME ***", "RESUMING");
         currentGoal = goalDAO.findCurrentGoal();
-        checkTestMode();
+        //checkTestMode();
         updateUI();
         super.onResume();
     }
@@ -328,14 +327,14 @@ public class HomePage extends AppCompatActivity {
         updateHomePage();
         updateHistoryList();
 
-        /*List<Goal> goals = goalDAO.findAll();
+        List<Goal> goals = goalDAO.findAll();
         for(Goal g : goals){
             String spacer = "";
             for(int i = g.getName().length(); i < 25; i++){
                 spacer += " ";
             }
             Log.i("HOMEPAGE - 336: ", g.getName() + spacer + " - " + g.getGoalCompleted() + "/" + g.getGoalTarget() + " " + g.getGoalUnits() + ", current: " + g.isCurrentGoal() + ", done: " + g.isDone() + ", date: " + g.getDateOfGoal());
-        }*/
+        }
     }
 
     public void updateGoalList(){
