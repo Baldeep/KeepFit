@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.keepfit.AddGoalPage;
 
 /**

@@ -1,20 +1,16 @@
 package cs551.baldeep.dialogs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dao.GoalDAO;
-import cs551.baldeep.keepfit.AddGoalPage;
 
 /**
  * Created by balde on 13/02/2017.

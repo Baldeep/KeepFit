@@ -5,14 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import cs551.baldeep.utils.AlarmUtils;
+import cs551.baldeep.utils.AppUtils;
 
 public class DeviceBootReciever extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            AlarmUtils.setUpAlarm(context);
+            AppUtils.setUpAlarm(context);
             Toast.makeText(context, "Set Up KeepFit Alarm", Toast.LENGTH_LONG).show();
         }
     }

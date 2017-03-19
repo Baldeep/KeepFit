@@ -24,21 +24,23 @@ import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import cs551.baldeep.adapters.HistoryListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
+import cs551.baldeep.dialogs.PastDatePickerDialog;
 import cs551.baldeep.listeners.CircleProgressOnClickListener;
 import cs551.baldeep.listeners.DrawerItemSelectedListener;
 import cs551.baldeep.listeners.FABOnClickListener;
 import cs551.baldeep.listeners.GoalListEditItemOnClickListener;
 import cs551.baldeep.dao.GoalDAO;
+import cs551.baldeep.listeners.TestModeDatePickerListener;
 import cs551.baldeep.models.Goal;
-import cs551.baldeep.utils.AlarmUtils;
+import cs551.baldeep.utils.AppUtils;
 import cs551.baldeep.utils.GoalUtils;
 import cs551.baldeep.utils.UIUtils;
 import cs551.baldeep.utils.Units;
@@ -71,6 +73,12 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
         today = new Date(System.currentTimeMillis());
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                checkTestMode();
+            }
+        });
 
         goalUtils = new GoalUtils(getApplicationContext());
         try {
@@ -131,7 +139,7 @@ public class HomePage extends AppCompatActivity {
 
         updateUI();
 
-        AlarmUtils.setUpAlarm(getApplicationContext());
+        AppUtils.setUpAlarm(getApplicationContext());
     }
 
     @Override
@@ -194,7 +202,8 @@ public class HomePage extends AppCompatActivity {
     protected void onResume() {
         Log.i("HOME ***", "RESUMING");
         currentGoal = goalDAO.findCurrentGoal();
-        //checkTestMode();
+
+        checkTestMode();
         updateUI();
         super.onResume();
     }
@@ -291,6 +300,12 @@ public class HomePage extends AppCompatActivity {
             goalUtils.endOfDay();
             currentGoal = goalDAO.findCurrentGoal();
             updateUI();
+        } else if(id == R.id.menu_set_date){
+            PastDatePickerDialog datePicker = new PastDatePickerDialog();
+            datePicker.setInitialDate(today);
+            datePicker.setListener(new TestModeDatePickerListener(this, sharedPreferences));
+            datePicker.show(getFragmentManager(), "Date Picker");
+            checkTestMode();
         }
 
         return super.onOptionsItemSelected(item);
@@ -377,17 +392,22 @@ public class HomePage extends AppCompatActivity {
         invalidateOptionsMenu();
 
         if(testMode){
-            today = new Date(System.currentTimeMillis());
+            today = AppUtils.getTestModeDate(sharedPreferences);
+            Log.i("CHECKTESTMODE", today.toString());
             SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
             testModeText.setText("TEST MODE (" + df.format(today) + ")");
             testModeText.setVisibility(View.VISIBLE);
             testModeHistory.setText("TEST MODE (" + df.format(today) + ")");
             testModeHistory.setVisibility(View.VISIBLE);
         } else {
+            Log.i("CHECKTESTMODE", today.toString());
             today = new Date(System.currentTimeMillis());
             testModeText.setVisibility(View.INVISIBLE);
             testModeHistory.setVisibility(View.INVISIBLE);
-
+        }
+        if(currentGoal != null) {
+            currentGoal.setDateOfGoal(today);
+            goalDAO.saveOrUpdate(currentGoal);
         }
     }
 

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.dialogs.AddActivityDialog;
 import cs551.baldeep.dialogs.InformationDialog;

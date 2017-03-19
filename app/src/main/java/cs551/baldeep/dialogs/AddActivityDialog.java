@@ -3,7 +3,6 @@ package cs551.baldeep.dialogs;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -18,7 +17,7 @@ import com.eralp.circleprogressview.CircleProgressView;
 
 import java.sql.SQLException;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.keepfit.R;
 import cs551.baldeep.models.Goal;

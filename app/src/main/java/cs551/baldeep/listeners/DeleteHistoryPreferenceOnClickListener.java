@@ -2,14 +2,9 @@ package cs551.baldeep.listeners;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.os.Bundle;
 import android.preference.Preference;
 
-import cs551.baldeep.constants.Constants;
-import cs551.baldeep.dao.GoalDAO;
-import cs551.baldeep.dialogs.DeleteGoalDialog;
 import cs551.baldeep.dialogs.DeleteHistoryDialog;
-import cs551.baldeep.dialogs.InformationDialog;
 
 /**
  * Created by balde on 17/03/2017.

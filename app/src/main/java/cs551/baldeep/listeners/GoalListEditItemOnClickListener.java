@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.keepfit.AddGoalPage;
 import cs551.baldeep.models.Goal;
 

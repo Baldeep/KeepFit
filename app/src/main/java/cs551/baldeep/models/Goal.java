@@ -117,13 +117,14 @@ public class Goal {
     }
 
     public void setDateOfGoal(Date dateOfGoal) {
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(dateOfGoal);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 1);
-        
+
         this.dateOfGoal = calendar.getTime();
     }
 

@@ -85,6 +85,7 @@
                                         android:textSize="@dimen/text_h3"
                                         android:visibility="invisible"
                                         android:text="TEST MODE"
+                                        android:textStyle="bold"
                                         android:textAlignment="viewEnd"
                                         android:id="@+id/txt_test_mode_active_history"/>
 
@@ -176,6 +177,7 @@
                                             android:textSize="@dimen/text_h3"
                                             android:visibility="invisible"
                                             android:text="TEST MODE"
+                                            android:textStyle="bold"
                                             android:textAlignment="viewEnd"
                                             android:id="@+id/txt_test_mode_active"/>
 

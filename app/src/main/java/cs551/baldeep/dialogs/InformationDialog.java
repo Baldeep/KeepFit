@@ -5,12 +5,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 
-import java.sql.SQLException;
-
-import cs551.baldeep.constants.Constants;
-import cs551.baldeep.dao.GoalDAO;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.keepfit.R;
 
 /**

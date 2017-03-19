@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import java.sql.SQLException;
 
-import cs551.baldeep.constants.Constants;
+import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.dialogs.DeleteGoalDialog;
 import cs551.baldeep.models.Goal;
