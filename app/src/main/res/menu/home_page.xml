@@ -4,6 +4,11 @@
 
     <group android:id="@+id/overflow_menu_test_options">
 
+        <item android:id="@+id/menu_test_mode_txt"
+            android:title="TEST MODE"
+            app:showAsAction="always"
+            />
+
         <item android:id="@+id/menu_make_history"
             android:title="Make Hardcoded History"
             android:orderInCategory="101"

@@ -18,6 +18,7 @@ import cs551.baldeep.models.Goal;
  */
 
 public class EndOfDayReceiver extends BroadcastReceiver {
+
     private GoalDAO goalDAO;
 
     @Override

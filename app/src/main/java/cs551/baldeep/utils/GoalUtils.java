@@ -77,7 +77,6 @@ public class GoalUtils {
 
             Goal previous = goalDAO.findFinishedForDate(currentGoal.getDateOfGoal());
             if(previous != null){
-                Log.i("GoalUtils, endOfDay", "found previous");
                 goalDAO.deleteById(previous.getGoalUUID());
             }
 
@@ -106,7 +105,7 @@ public class GoalUtils {
 
         if(units.equals(Units.STEPS)){
             DecimalFormat df = new DecimalFormat("0");
-            formatted += df.format((int)convertedProgress + "/" + (int)convertedProgress
+            formatted += (df.format(convertedProgress) + "/" + df.format(convertedProgress)
                     + " " + units);
         } else {
             DecimalFormat df = new DecimalFormat("0.000");

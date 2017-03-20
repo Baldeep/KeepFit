@@ -15,6 +15,8 @@ public class Units {
     public static final String MILES = "Miles";
     public static final String YARDS = "Yards";
 
+    public static final String ORIGINAL = "Original";
+
     public static double STEP_LENGHT_M = 0.7;
 
     public static double getStepsInM(double steps){
@@ -35,6 +37,11 @@ public class Units {
 
     public static String[] getUnitStrings(){
         String [] units = {STEPS, KM, M, MILES, YARDS};
+        return units;
+    }
+
+    public static String[] getFilterUnitStrings(){
+        String [] units = {ORIGINAL, STEPS, KM, M, MILES, YARDS};
         return units;
     }
 

@@ -31,9 +31,11 @@
             android:label="Settings"
             android:theme="@style/AppTheme"/>
 
-        <receiver android:name="cs551.baldeep.receivers.EndOfDayReceiver"/>
+        <receiver android:name="cs551.baldeep.receivers.EndOfDayReceiver"
+            android:enabled="true"/>
 
-        <receiver android:name="cs551.baldeep.receivers.DeviceBootReciever">
+        <receiver android:name="cs551.baldeep.receivers.DeviceBootReciever"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>

@@ -44,7 +44,7 @@ public class AppUtils {
         calendar.set(year, month, dayOfMonth, 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 1);
 
-        Log.i("AppUtilsSharedPrefDate", "Date: " + dayOfMonth + "/" + month + "/" + year);
+        //Log.i("AppUtilsSharedPrefDate", "Date: " + dayOfMonth + "/" + month + "/" + year);
 
         return calendar.getTime();
     }
