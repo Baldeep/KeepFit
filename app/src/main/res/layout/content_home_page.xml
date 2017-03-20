@@ -71,12 +71,20 @@
                                     android:orientation="horizontal">
 
                                     <TextView
-                                        android:text="@string/your_goal_history"
-                                        android:textSize="@dimen/text_h2"
+                                        android:text="Filter: "
+                                        android:textSize="@dimen/text_h1_2"
                                         android:textColor="@android:color/black"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:id="@+id/historyHeading"/>
+                                        android:id="@+id/txt_history_date_filter"/>
+
+                                    <Spinner
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/history_date_filter_spinner"
+                                        android:layout_marginLeft="7dp">
+
+                                    </Spinner>
 
                                     <TextView
                                         android:layout_width="match_parent"
@@ -88,6 +96,101 @@
                                         android:textStyle="bold"
                                         android:textAlignment="viewEnd"
                                         android:id="@+id/txt_test_mode_active_history"/>
+
+                                </LinearLayout>
+
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="1"
+                                    android:visibility="gone"
+                                    android:id="@+id/history_custom_filter_layout">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:layout_marginRight="1dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:text="Start: "
+                                            android:textSize="@dimen/text_h3"
+                                            android:textColor="@android:color/black"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="0.5"
+                                            android:id="@+id/txt_history_date_start_filter"/>
+
+                                        <Button
+                                            android:text="None Set"
+                                            android:textSize="@dimen/text_h3"
+                                            android:textColor="@android:color/black"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:backgroundTint="@color/colorAccent"
+                                            android:id="@+id/btn_history_date_start_filter"/>
+
+                                        <ImageButton
+                                            android:background="@android:drawable/ic_delete"
+                                            android:backgroundTint="@color/colorAccent"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:id="@+id/btn_history_date_start_clear"/>
+
+                                    </LinearLayout>
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:layout_marginLeft="1dp"
+                                        android:orientation="horizontal">
+                                        <TextView
+                                            android:text="End: "
+                                            android:textSize="@dimen/text_h3"
+                                            android:textColor="@android:color/black"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="0.5"
+                                            android:id="@+id/txt_history_date_end_filter"/>
+                                        <Button
+                                            android:text="None Set"
+                                            android:textSize="@dimen/text_h3"
+                                            android:textColor="@android:color/black"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:backgroundTint="@color/colorAccent"
+                                            android:id="@+id/btn_history_date_end_filter"/>
+
+                                        <ImageButton
+                                            android:background="@android:drawable/ic_delete"
+                                            android:backgroundTint="@color/colorAccent"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:id="@+id/btn_history_date_end_clear"/>
+                                        </LinearLayout>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:layout_marginTop="5dp">
+
+                                    <TextView
+                                        android:text="@string/your_goal_history"
+                                        android:textSize="@dimen/text_h2"
+                                        android:textColor="@android:color/black"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/historyHeading"/>
+
+
 
                                 </LinearLayout>
 
@@ -113,7 +216,7 @@
                                 <ListView
                                     android:id="@+id/list_history"
                                     android:layout_width="match_parent"
-                                    android:layout_height="200dp"
+                                    android:layout_height="0dp"
                                     android:divider="@color/colorDivider"
                                     android:dividerHeight="1dp"
                                     android:footerDividersEnabled="true"
@@ -190,6 +293,7 @@
                                         android:layout_centerVertical ="true"
                                         android:layout_alignParentTop="true"/>
 
+
                                     <TextView
                                         android:text="@string/no_goals_have_been_created_yet"
                                         android:textSize="@dimen/text_h1"
@@ -206,6 +310,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:layout_marginTop="5dp"
+
                                     android:id="@+id/currentGoalMetIcon"/>
 
                             </LinearLayout>

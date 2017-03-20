@@ -14,6 +14,8 @@ import android.widget.Toast;
 import java.util.Date;
 import java.util.Calendar;
 
+import cs551.baldeep.keepfit.R;
+
 /**
  * Created by balde on 19/03/2017.
  */
@@ -22,13 +24,15 @@ public class PastDatePickerDialog extends DialogFragment implements DatePickerDi
 
     private DatePickerDialog.OnDateSetListener listener;
     private Date initialDate;
+    private Date minDate;
+    private Date maxDate;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
         final Calendar c = Calendar.getInstance();
 
-        if(initialDate == null){
+        if (initialDate == null) {
             initialDate = new Date(System.currentTimeMillis());
         }
 
@@ -40,7 +44,16 @@ public class PastDatePickerDialog extends DialogFragment implements DatePickerDi
         DatePickerDialog dpd = new DatePickerDialog(getActivity(), listener, year, month, day);
 
         DatePicker dp = dpd.getDatePicker();
-        dp.setMaxDate(System.currentTimeMillis());
+
+        if(minDate != null){
+            dp.setMinDate(minDate.getTime());
+        }
+
+        if (maxDate != null) {
+            dp.setMaxDate(maxDate.getTime());
+        } else {
+            dp.setMaxDate(System.currentTimeMillis() + 84000);
+        }
 
         return dpd;
     }
@@ -51,6 +64,14 @@ public class PastDatePickerDialog extends DialogFragment implements DatePickerDi
 
     public void setListener(DatePickerDialog.OnDateSetListener listener){
         this.listener = listener;
+    }
+
+    public void setMinDate(Date date){
+        this.minDate = date;
+    }
+
+    public void setMaxDate(Date date){
+        this.maxDate = date;
     }
 
     @Override

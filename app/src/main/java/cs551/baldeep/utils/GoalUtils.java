@@ -3,9 +3,13 @@ package cs551.baldeep.utils;
 import android.content.Context;
 import android.util.Log;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.models.Goal;
@@ -17,6 +21,11 @@ import cs551.baldeep.models.Goal;
 public class GoalUtils {
 
     private GoalDAO goalDAO;
+
+    public static String HISTORY_ALL = "All";
+    public static String HISTORY_WEEK = "Week";
+    public static String HISTORY_MONTH = "Month";
+    public static String HISTORY_CUSTOM = "Custom";
 
     public GoalUtils(Context context) {
         try {
@@ -108,5 +117,83 @@ public class GoalUtils {
         return formatted;
     }
 
+    public List<String> getHistoryFilterStrings(){
+        List<String> historyFilters = new ArrayList<String>();
+        historyFilters.add(HISTORY_ALL);
+        historyFilters.add(HISTORY_WEEK);
+        historyFilters.add(HISTORY_MONTH);
+        historyFilters.add(HISTORY_CUSTOM);
+        return historyFilters;
+    }
+
+    public List<Goal> filterHistory(String dateFilter, Date startDate, Date endDate, int percentageStart, int percentageEnd){
+
+        Date dateStart = null;
+        Date dateEnd = null;
+
+        int completedStart = 0;
+        int completedEnd = 100;
+
+        if(percentageStart > percentageEnd){
+            completedEnd = percentageStart;
+            completedStart = percentageEnd;
+        } else {
+            completedStart = percentageStart;
+            completedEnd = percentageEnd;
+        }
+
+        Calendar cal = new GregorianCalendar();
+
+        if(dateFilter == GoalUtils.HISTORY_ALL){
+            dateStart = null;
+            dateEnd = null;
+        } else if(dateFilter == GoalUtils.HISTORY_WEEK){
+            cal.setTime(new Date(System.currentTimeMillis()));
+
+            dateEnd = cal.getTime();
+            cal.add(Calendar.DAY_OF_YEAR, -7);
+            dateStart = cal.getTime();
+        } else if(dateFilter == GoalUtils.HISTORY_MONTH){
+            cal.setTime(new Date(System.currentTimeMillis()));
+
+            dateEnd = cal.getTime();
+            cal.add(Calendar.MONTH, -1);
+            dateStart = cal.getTime();
+        } else if(dateFilter == GoalUtils.HISTORY_CUSTOM){
+
+            if(startDate != null) {
+                cal.setTime(startDate);
+                if (cal.get(Calendar.YEAR) < 1970) {
+                    startDate = null;
+                }
+            }
+            if(endDate != null) {
+                cal.setTime(endDate);
+                if (cal.get(Calendar.YEAR) < 1970) {
+                    endDate = null;
+                }
+            }
+
+            if(startDate != null && endDate != null){
+                if(startDate.compareTo(endDate) == 1){
+                    dateStart = endDate;
+                    dateEnd = startDate;
+                } else {
+                    dateStart = startDate;
+                    dateEnd = endDate;
+                }
+            } else {
+                dateStart = startDate;
+                dateEnd = endDate;
+            }
+
+        }
+
+        //Log.i("GOALUTILS, FILTERING", "Mode: " + dateFilter + "Date Start: " + dateStart + ", Date End: " + dateEnd +
+        //", % start: " + completedStart + ", % end: " + completedEnd);
+
+        return goalDAO.findAllFinishedByFilters(dateStart, dateEnd, completedStart, completedEnd);
+
+    }
 
 }

@@ -16,14 +16,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -31,6 +37,7 @@ import java.util.List;
 
 import cs551.baldeep.adapters.HistoryListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
+import cs551.baldeep.listeners.FilterDatePickerListener;
 import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dialogs.PastDatePickerDialog;
 import cs551.baldeep.listeners.CircleProgressOnClickListener;
@@ -50,17 +57,27 @@ public class HomePage extends AppCompatActivity {
     private static final int RESULT_ADD_GOAL = 1;
     private static final int RESULT_SETTINGS = 2;
     private static final int RESULT_EDIT_GOAL = 3;
+
     private Goal currentGoal;
     private List<Goal> goalList;
+    private List<Goal> historyList;
 
     private SharedPreferences sharedPreferences;
-    protected DrawerLayout drawer;
+    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceListener;
 
+    protected DrawerLayout drawer;
     private CircleProgressView mCircleProgressView;
     private FloatingActionButton fab;
 
     private ListView listOfGoals;
     private ListView listOfHistory;
+
+    // Filtering UI elements
+    protected String historyFilterDateMode;
+    protected Date startFilterDate;
+    protected Date endFilterDate;
+    protected int historyFilterCompletedStart = 0;
+    protected int historyFilterCompletedEnd = 100;
 
     private GoalDAO goalDAO;
     private GoalUtils goalUtils;
@@ -72,13 +89,22 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         today = new Date(System.currentTimeMillis());
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        // This listener stops showing changes made to the date after 3 changes...weird
+        sharedPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                checkTestMode();
+                if(key.startsWith(Constants.TEST_MODE)){
+                    checkTestMode();
+                } else if(key.startsWith("filter_")) {
+                    filterHistory();
+                }
+                Log.i("HOME,PREFLISTENER", "Prefs updated: " + key);
             }
-        });
+        };
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceListener);
+
 
         goalUtils = new GoalUtils(getApplicationContext());
         try {
@@ -90,6 +116,8 @@ public class HomePage extends AppCompatActivity {
         }
 
         checkTestMode();
+
+        historyList = goalDAO.findAllFinished();
 
         goalList = goalDAO.findAll();
         currentGoal = goalDAO.findCurrentGoal();
@@ -109,8 +137,74 @@ public class HomePage extends AppCompatActivity {
         listOfGoals.setFocusable(false);
         GoalListEditItemOnClickListener listOfGoalsItemClickListener = new GoalListEditItemOnClickListener(this, listOfGoals);
         listOfGoals.setOnItemClickListener(listOfGoalsItemClickListener);
+
+        // HISTORY
         listOfHistory = (ListView) findViewById(R.id.list_history);
         listOfHistory.setFocusable(false);
+
+        final Spinner historyDateSpinner = (Spinner) findViewById(R.id.history_date_filter_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, goalUtils.getHistoryFilterStrings());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        historyDateSpinner.setAdapter(adapter);
+        historyDateSpinner.setSelection(adapter.getPosition(GoalUtils.HISTORY_ALL));
+        historyDateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                historyFilterDateMode = parent.getItemAtPosition(position).toString();
+
+                LinearLayout customBtns = (LinearLayout) findViewById(R.id.history_custom_filter_layout);
+                if(historyFilterDateMode == GoalUtils.HISTORY_CUSTOM){
+                    customBtns.setVisibility(View.VISIBLE);
+                } else {
+                    customBtns.setVisibility(View.GONE);
+                }
+                filterHistory();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                historyDateSpinner.setSelection(0);
+            }
+        });
+
+        final Button startDateBtn = (Button) findViewById(R.id.btn_history_date_start_filter);
+        startDateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PastDatePickerDialog datePicker = new PastDatePickerDialog();
+                datePicker.setInitialDate(today);
+                datePicker.setListener(new FilterDatePickerListener(sharedPreferences, Constants.START));
+                if (!AppUtils.dateIsOutOfBounds(endFilterDate)) {
+                    datePicker.setMaxDate(endFilterDate);
+                }
+                if (!AppUtils.dateIsOutOfBounds(startFilterDate)){
+                    datePicker.setInitialDate(startFilterDate);
+                } else {
+                    datePicker.setInitialDate(new Date(System.currentTimeMillis()));
+                }
+                datePicker.show(getFragmentManager(), "Date Picker");
+            }
+        });
+
+        Button endDateBtn = (Button) findViewById(R.id.btn_history_date_end_filter);
+        endDateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PastDatePickerDialog datePicker = new PastDatePickerDialog();
+                datePicker.setListener(new FilterDatePickerListener(sharedPreferences, Constants.END));
+                if(!AppUtils.dateIsOutOfBounds(startFilterDate)){
+                    datePicker.setMinDate(startFilterDate);
+                }
+                if (!AppUtils.dateIsOutOfBounds(endFilterDate)){
+                    datePicker.setInitialDate(endFilterDate);
+                } else {
+                    datePicker.setInitialDate(new Date(System.currentTimeMillis()));
+                }
+                datePicker.show(getFragmentManager(), "Date Picker");
+            }
+        });
+
+
 
         // Clicking progressBar
         CircleProgressOnClickListener circleListener = new CircleProgressOnClickListener(getFragmentManager(), goalDAO);
@@ -146,6 +240,7 @@ public class HomePage extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+
 
         Log.i("HomePage.OnResult", "requestCode: " + requestCode + ", resultCode: " + resultCode);
         if(resultCode == RESULT_ADD_GOAL){
@@ -184,10 +279,6 @@ public class HomePage extends AppCompatActivity {
                 goalDAO.saveOrUpdate(newGoal);
             }
             updateHomePage();
-        } else if(resultCode == RESULT_SETTINGS){
-
-        } else if(resultCode == 3){
-            Log.i("HOME *** ", "Got result from add - " + data.getStringExtra("A"));
         }
     }
 
@@ -303,7 +394,7 @@ public class HomePage extends AppCompatActivity {
         } else if(id == R.id.menu_set_date){
             PastDatePickerDialog datePicker = new PastDatePickerDialog();
             datePicker.setInitialDate(today);
-            datePicker.setListener(new TestModeDatePickerListener(this, sharedPreferences));
+            datePicker.setListener(new TestModeDatePickerListener(sharedPreferences));
             datePicker.show(getFragmentManager(), "Date Picker");
             checkTestMode();
         }
@@ -348,7 +439,9 @@ public class HomePage extends AppCompatActivity {
             for(int i = g.getName().length(); i < 25; i++){
                 spacer += " ";
             }
-            Log.i("HOMEPAGE - 336: ", g.getName() + spacer + " - " + g.getGoalCompleted() + "/" + g.getGoalTarget() + " " + g.getGoalUnits() + ", current: " + g.isCurrentGoal() + ", done: " + g.isDone() + ", date: " + g.getDateOfGoal());
+            Log.i("HOMEPAGE - 336: ", g.getName() + spacer + " - " + g.getGoalCompleted() + "/" +
+                    g.getGoalTarget() + " " + g.getGoalUnits() + " (" + g.getPercentageCompleted() + "), current: " + g.isCurrentGoal() +
+                    ", done: " + g.isDone() + ", date: " + g.getDateOfGoal());
         }
     }
 
@@ -367,17 +460,17 @@ public class HomePage extends AppCompatActivity {
     }
 
     public void updateHistoryList(){
-        // Goals List
-        List<Goal> goalsFinished = goalDAO.findAllFinished();
 
+        // Goals List
         TextView listReplacementText = (TextView) findViewById(R.id.txt_no_history_list_replacement);
-        if(goalsFinished.size()>0){
+        if(historyList.size()>0){
             listReplacementText.setVisibility(View.GONE);
         } else {
             listReplacementText.setVisibility(View.VISIBLE);
         }
 
-        ListAdapter historyAdapter = new HistoryListAdapter(this,goalsFinished);
+
+        ListAdapter historyAdapter = new HistoryListAdapter(this,historyList);
         listOfHistory.setAdapter(historyAdapter);
         UIUtils.setListViewHeightBasedOnItems(listOfHistory);
     }
@@ -392,7 +485,7 @@ public class HomePage extends AppCompatActivity {
         invalidateOptionsMenu();
 
         if(testMode){
-            today = AppUtils.getTestModeDate(sharedPreferences);
+            today = AppUtils.getSharedPreferecnceDate(sharedPreferences, Constants.TEST_MODE + "_");
             Log.i("CHECKTESTMODE", today.toString());
             SimpleDateFormat df = new SimpleDateFormat(sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy"));
             testModeText.setText("TEST MODE (" + df.format(today) + ")");
@@ -410,5 +503,41 @@ public class HomePage extends AppCompatActivity {
             goalDAO.saveOrUpdate(currentGoal);
         }
     }
+
+    protected void filterHistory(){
+        if(historyFilterDateMode == null){
+            historyFilterDateMode = GoalUtils.HISTORY_ALL;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+        startFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.START + "_");
+
+        Button startDateBtn = (Button) findViewById(R.id.btn_history_date_start_filter);
+        Log.i("HOMEPAGE, FILTERHISTORY", sdf.format(startFilterDate));
+
+        if(AppUtils.dateIsOutOfBounds(startFilterDate)){
+            startDateBtn.setText("None Set");
+        } else {
+            startDateBtn.setText(sdf.format(startFilterDate));
+        }
+
+        endFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.END + "_");
+        Button endDateBtn = (Button) findViewById(R.id.btn_history_date_end_filter);
+
+        if(AppUtils.dateIsOutOfBounds(endFilterDate)){
+            endDateBtn.setText("None Set");
+        } else {
+            endDateBtn.setText(sdf.format(endFilterDate));
+        }
+
+        historyList = goalUtils.filterHistory(historyFilterDateMode,
+                startFilterDate,  endFilterDate,
+                historyFilterCompletedStart, historyFilterCompletedEnd);
+
+        Log.i("HOMEPAGE, FILTERHISTORY", "Found in history: " + historyList.size());
+
+        updateHistoryList();
+    }
+
 
 }

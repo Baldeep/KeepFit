@@ -21,6 +21,7 @@ public class DeleteAllGoalsDialog extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AlertDialog.Builder confirmDialog = new AlertDialog.Builder(getActivity());
 
         confirmDialog.setTitle("Delete Goals");

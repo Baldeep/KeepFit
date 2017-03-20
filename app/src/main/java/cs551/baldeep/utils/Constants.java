@@ -29,9 +29,13 @@ public class Constants {
 
 
     public static final String TEST_MODE = "test_mode";
-    public static final String TEST_MODE_YEAR = "test_mode_date_year";
-    public static final String TEST_MODE_MONTH = "test_mode_date_month";
-    public static final String TEST_MODE_DAY = "test_mode_date_day";
+    public static final String DATE_YEAR = "date_year";
+    public static final String DATE_MONTH = "date_month";
+    public static final String DATE_DAY = "date_day";
     public static final String DATE_FORMAT = "dateFormats";
+
+    public static final String BUNDLE = "Bundle";
+    public static final String START = "start";
+    public static final String END = "end";
 
 }

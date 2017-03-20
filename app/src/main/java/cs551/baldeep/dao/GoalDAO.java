@@ -181,4 +181,38 @@ public class GoalDAO {
             return false;
         }
     }
+
+    public List<Goal> findAllFinishedByFilters(Date startDate, Date endDate, int startPercentage, int endPecentage){
+        try{
+            QueryBuilder<Goal, String> queryBuilder = goalDAO.queryBuilder();
+
+            Where where = queryBuilder.where();
+            where.eq(Goal.GOAL_DONE, true);
+            where.and();
+
+            if(startDate != null) {
+                where.ge(Goal.GOAL_DATE, startDate);
+                where.and();
+            }
+            if(endDate != null) {
+                where.le(Goal.GOAL_DATE, endDate);
+                where.and();
+            }
+
+            where.ge(Goal.PERCENTAGE_COMPLETED, startPercentage);
+            if(endPecentage < 100) {
+                where.and();
+                where.le(Goal.PERCENTAGE_COMPLETED, endPecentage);
+            }
+
+            queryBuilder.orderBy(Goal.GOAL_DATE, false);
+
+            PreparedQuery<Goal> query = queryBuilder.prepare();
+
+            return goalDAO.query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<Goal>();
+        }
+    }
 }

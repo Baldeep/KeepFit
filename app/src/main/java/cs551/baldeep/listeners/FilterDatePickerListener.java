@@ -16,12 +16,14 @@ import cs551.baldeep.utils.Constants;
  * Created by balde on 19/03/2017.
  */
 
-public class TestModeDatePickerListener implements DatePickerDialog.OnDateSetListener  {
+public class FilterDatePickerListener implements DatePickerDialog.OnDateSetListener  {
 
     private SharedPreferences sharedPreferences;
+    private String filterDateType;
 
-    public TestModeDatePickerListener(SharedPreferences sharedPreferences){
+    public FilterDatePickerListener(SharedPreferences sharedPreferences, String startOrEnd){
         this.sharedPreferences = sharedPreferences;
+        this.filterDateType = startOrEnd;
     }
 
     @Override
@@ -34,12 +36,20 @@ public class TestModeDatePickerListener implements DatePickerDialog.OnDateSetLis
 
         Log.i("DatePickerListener", "Date: " + selectedDate.toString() + sharedPreferences.toString());
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        /*SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(Constants.TEST_MODE + "_" + Constants.DATE_YEAR, year);
         editor.putInt(Constants.TEST_MODE + "_" + Constants.DATE_MONTH, month);
         editor.putInt(Constants.TEST_MODE + "_" + Constants.DATE_DAY, dayOfMonth);
+        editor.apply();*/
+
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("filter_" + filterDateType + "_" + Constants.DATE_YEAR, year);
+        editor.putInt("filter_" + filterDateType + "_" + Constants.DATE_MONTH, month);
+        editor.putInt("filter_" + filterDateType + "_" + Constants.DATE_DAY, dayOfMonth);
         editor.apply();
 
     }
 
 }
+
