@@ -2,7 +2,6 @@ package cs551.baldeep.keepfit;
 
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 
@@ -11,6 +10,8 @@ import java.sql.SQLException;
 import cs551.baldeep.dao.GoalDAO;
 import cs551.baldeep.listeners.DeleteAllGoalsPreferenceOnClickListener;
 import cs551.baldeep.listeners.DeleteHistoryPreferenceOnClickListener;
+import cs551.baldeep.listeners.StrideLenghtPreferenceOnClickListener;
+import cs551.baldeep.utils.Constants;
 
 
 public class SettingsPage extends AppCompatActivity {
@@ -59,6 +60,9 @@ public class SettingsPage extends AppCompatActivity {
                 Thread.UncaughtExceptionHandler ueh = Thread.getDefaultUncaughtExceptionHandler();
                 ueh.uncaughtException(Thread.currentThread(), e);
             }
+
+            Preference setStrideLen = (Preference) findPreference(Constants.STRIDE_LENGTH);
+            setStrideLen.setOnPreferenceClickListener(new StrideLenghtPreferenceOnClickListener(getFragmentManager()));
 
             Preference clearHistory = (Preference) findPreference("clear_db_history");
             clearHistory.setOnPreferenceClickListener(new DeleteHistoryPreferenceOnClickListener(getFragmentManager()));

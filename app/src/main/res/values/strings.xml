@@ -5,10 +5,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="your_daily_goal_heading">Your Daily Goal:</string>
+    <string name="your_daily_goal_heading">My Daily Goal:</string>
     <string name="no_goal_message">No goal set for today!</string>
-    <string name="your_goals_heading">Your Goals:</string>
+    <string name="your_goals_heading">My Goals:</string>
     <string name="no_goals_have_been_created_yet">No goals to show :( \n Create more goals!</string>
-    <string name="your_goal_history">Your Goal History</string>
+    <string name="your_goal_history">My Goal History</string>
     <string name="no_history_to_show">No history to show :(</string>
+    <string name="lock_goals">lock_goals</string>
+    <string name="stride_length">stride_length</string>
 </resources>

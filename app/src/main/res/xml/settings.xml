@@ -10,25 +10,36 @@
             android:key="test_mode" />
 
         <ListPreference android:title="Date Format"
-            android:summary="Select the format of the date in test mode"
+            android:summary="Select the format of dates"
             android:key="dateFormats"
             android:defaultValue="1"
             android:entries="@array/dateFormatsNames"
             android:entryValues="@array/dateFormats" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="App Settings">
+
+        <SwitchPreference android:title="Lock Goals"
+            android:summary="Stop goals from being edited once created."
+            android:key="@string/lock_goals"/>
+
+        <Preference android:title="Set Stride Length"
+            android:inputType="number"
+            android:key="@string/stride_length"
+            />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Data Settings">
         <Preference android:title="Clear Goals"
-            android:key="clear_db_goals"
-            android:summary="Remove all goals"/>
+            android:key="clear_db_goals"/>
 
         <Preference android:title="Clear History"
-            android:key="clear_db_history"
-            android:summary="Removes past goals"/>
+            android:key="clear_db_history"/>
 
         <Preference android:title="Clear All Data"
             android:key="clear_all_data"
-            android:summary="Removes all goals"/>
+            android:summary="Removes all goals, history and present"/>
 
     </PreferenceCategory>
 

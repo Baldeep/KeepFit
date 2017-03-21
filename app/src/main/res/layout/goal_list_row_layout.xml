@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:text="Edit"
+            android:id="@+id/txt_edit_goal_label"
             android:layout_weight="0"
             android:layout_gravity="start|right|center_vertical"
             android:paddingRight="7dp"

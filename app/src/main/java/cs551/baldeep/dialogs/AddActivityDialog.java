@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -72,6 +73,8 @@ public class AddActivityDialog extends DialogFragment{
                     activityToAdd = Double.valueOf(activityToAddString);
                 }
 
+                Log.i("ADDACTIVITYDIALOG", "activity to add: " + activityToAddString);
+
                 GoalUtils goalUtils = new GoalUtils(getActivity().getApplicationContext());
                 Goal currentGoal = goalUtils.addActivityToGoal(goalUUID, activityToAdd, unitsSpinner.getSelectedItem().toString());
 
@@ -83,10 +86,6 @@ public class AddActivityDialog extends DialogFragment{
 
                 Toast.makeText(getActivity().getApplicationContext(), "Activity recorded", Toast.LENGTH_SHORT);
 
-               /* Intent i = new Intent();
-                i.putExtra("A", Constants.ADD);
-                (A).setResult(3, i);*/
-                //getTargetFragment().onActivityResult(getTargetRequestCode(), 0, getActivity().getIntent());
             }
         });
 

@@ -21,6 +21,7 @@ import cs551.baldeep.models.Goal;
 public class GoalUtils {
 
     private GoalDAO goalDAO;
+    private Units unitsUtils;
 
     public static String HISTORY_ALL = "All";
     public static String HISTORY_WEEK = "Week";
@@ -33,6 +34,8 @@ public class GoalUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        unitsUtils = new Units(context);
     }
 
     public Goal addActivityToGoal(String goalUUID, double value, String units){
@@ -40,17 +43,20 @@ public class GoalUtils {
         if(g != null){
             double progress = g.getGoalCompleted();
 
-            double steps = Units.getUnitsInSteps(units, value);
+            double steps = unitsUtils.getUnitsInSteps(units, value);
 
             if(g.getGoalUnits().equals(Units.STEPS)){
                 progress += steps;
             } else {
-                progress += Units.getStepsInUnits(g.getGoalUnits(), steps);
+                progress += unitsUtils.getStepsInUnits(g.getGoalUnits(), steps);
             }
+
 
             g.setGoalCompleted(progress);
 
-            goalDAO.saveOrUpdate(g);
+            boolean saved = goalDAO.saveOrUpdate(g);
+
+            Log.i("GOALUTILS ADDACTIVITY", "progress: " + progress + ", gUnit: " + g.getGoalUnits() + ", steps: " + steps);
         }
         return goalDAO.findById(goalUUID);
     }
@@ -62,7 +68,7 @@ public class GoalUtils {
             formatted += df.format(g.getGoalCompleted()) + "/" + (int)g.getGoalTarget()
                     + " " + g.getGoalUnits();
         } else {
-            DecimalFormat df = new DecimalFormat("#.000");
+            DecimalFormat df = new DecimalFormat("0.000");
             formatted += df.format(g.getGoalCompleted()) + "/" + g.getGoalTarget()
                     + " " + g.getGoalUnits();
         }
@@ -97,15 +103,16 @@ public class GoalUtils {
     public String getFormattedProgressStringInUnits(Goal g, String units){
         String formatted = "";
 
-        double tempSteps = Units.getUnitsInSteps(g.getGoalUnits(), g.getGoalCompleted());
-        double convertedProgress = Units.getStepsInUnits(units, tempSteps);
+        double tempSteps = unitsUtils.getUnitsInSteps(g.getGoalUnits(), g.getGoalCompleted());
+        double convertedProgress = unitsUtils.getStepsInUnits(units, tempSteps);
 
-        tempSteps = Units.getUnitsInSteps(g.getGoalUnits(), g.getGoalTarget());
-        double convertedValue = Units.getStepsInUnits(units, tempSteps);
+
+        tempSteps = unitsUtils.getUnitsInSteps(g.getGoalUnits(), g.getGoalTarget());
+        double convertedValue = unitsUtils.getStepsInUnits(units, tempSteps);
 
         if(units.equals(Units.STEPS)){
             DecimalFormat df = new DecimalFormat("0");
-            formatted += (df.format(convertedProgress) + "/" + df.format(convertedProgress)
+            formatted += (df.format(convertedProgress) + "/" + df.format(convertedValue)
                     + " " + units);
         } else {
             DecimalFormat df = new DecimalFormat("0.000");
@@ -194,5 +201,55 @@ public class GoalUtils {
         return goalDAO.findAllFinishedByFilters(dateStart, dateEnd, completedStart, completedEnd);
 
     }
+
+    public Goal getMaxActivity(String dateFilter, Date startDate, Date endDate, int percentageStart, int percentageEnd){
+        List<Goal> filteredGoals = filterHistory(dateFilter, startDate, endDate, percentageStart, percentageEnd);
+
+        Log.i("GUtilsMAX", "filtered: " + filteredGoals.size());
+        if(filteredGoals.size() > 0) {
+            double maxActivity = unitsUtils.getUnitsInSteps(filteredGoals.get(0).getGoalUnits(), filteredGoals.get(0).getGoalCompleted());
+            Goal maxGoal = filteredGoals.get(0);
+
+            for(int i = 1; i < filteredGoals.size(); i++){
+                double thisActivty = unitsUtils.getUnitsInSteps(filteredGoals.get(i).getGoalUnits(), filteredGoals.get(0).getGoalCompleted());
+                if(thisActivty > maxActivity){
+                    Log.i("GUtilsMAX", "Swapped " + maxGoal.getName() + ": " + maxActivity + ", for " +
+                            filteredGoals.get(i) + ": " + thisActivty);
+                    maxActivity = thisActivty;
+                    maxGoal = filteredGoals.get(i);
+                }
+            }
+
+            return maxGoal;
+        }
+        return null;
+    }
+
+    public Goal getMinActivity(String dateFilter, Date startDate, Date endDate, int percentageStart, int percentageEnd){
+        List<Goal> filteredGoals = filterHistory(dateFilter, startDate, endDate, percentageStart, percentageEnd);
+
+        if(filteredGoals.size() > 0) {
+            double minActivity = unitsUtils.getUnitsInSteps(filteredGoals.get(0).getGoalUnits(), filteredGoals.get(0).getGoalCompleted());
+            Goal minGoal = filteredGoals.get(0);
+
+            for(int i = 1; i < filteredGoals.size(); i++){
+                double thisActivty = unitsUtils.getUnitsInSteps(filteredGoals.get(i).getGoalUnits(), filteredGoals.get(0).getGoalCompleted());
+                if(thisActivty < minActivity){
+                    Log.i("GUMIN", "Swapped " + minGoal.getName() + ": " + minActivity + ", for " +
+                        filteredGoals.get(i) + ": " + thisActivty);
+                    minActivity = thisActivty;
+                    minGoal = filteredGoals.get(i);
+
+                }
+            }
+
+            return minGoal;
+        }
+        return null;
+    }
+
+
+
+
 
 }

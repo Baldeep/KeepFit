@@ -1,5 +1,6 @@
 package cs551.baldeep.utils;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -28,6 +29,10 @@ public class UIUtils {
                 View item = listAdapter.getView(itemPos, null, listView);
                 item.measure(0, 0);
                 totalItemsHeight += item.getMeasuredHeight();
+
+                if(itemPos == numberOfItems - 1){
+                    totalItemsHeight += item.getMeasuredHeight()/2;
+                }
             }
 
             // Get total height of all item dividers.
@@ -40,6 +45,7 @@ public class UIUtils {
             listView.setLayoutParams(params);
             listView.requestLayout();
 
+            Log.i("UIUTILS", "Updated List Lenght: " + (totalDividersHeight + totalDividersHeight)+ "dp");
             return true;
 
         } else {

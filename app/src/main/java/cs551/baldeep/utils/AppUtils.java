@@ -52,6 +52,7 @@ public class AppUtils {
     public static boolean dateIsOutOfBounds(Date date){
         Calendar c = Calendar.getInstance();
         c.setTime(date);
+        Log.i("AppUtils", c.toString() + ": Time outta bounds?");
         if(c.get(Calendar.YEAR) < 1970){
             return true;
         } else {
@@ -60,4 +61,32 @@ public class AppUtils {
     }
 
 
+    public static void resetHistoryFilterPreference(SharedPreferences sharedPreferences) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(Constants.FILTER_HISTORY_MODE, GoalUtils.HISTORY_ALL);
+
+        editor.putString(Constants.FILTER_HISTORY_UNITS, Units.ORIGINAL);
+
+        editor.putInt("filter_" + Constants.START + "_" + Constants.DATE_YEAR, 0);
+        editor.putInt("filter_" + Constants.START + "_" + Constants.DATE_MONTH, 0);
+        editor.putInt("filter_" + Constants.START + "_" + Constants.DATE_DAY, 0);
+        editor.putInt("filter_" + Constants.END + "_" + Constants.DATE_YEAR, 0);
+        editor.putInt("filter_" + Constants.END + "_" + Constants.DATE_MONTH, 0);
+        editor.putInt("filter_" + Constants.END + "_" + Constants.DATE_DAY, 0);
+
+        editor.putString(Constants.FILTER_STATS_MODE, GoalUtils.HISTORY_ALL);
+
+        editor.putString(Constants.FILTER_STATS_UNITS, Units.ORIGINAL);
+
+        editor.putInt("filter_stats_" + Constants.START + "_" + Constants.DATE_YEAR, 0);
+        editor.putInt("filter_stats_" + Constants.START + "_" + Constants.DATE_MONTH, 0);
+        editor.putInt("filter_stats_" + Constants.START + "_" + Constants.DATE_DAY, 0);
+        editor.putInt("filter_stats_" + Constants.END + "_" + Constants.DATE_YEAR, 0);
+        editor.putInt("filter_stats_" + Constants.END + "_" + Constants.DATE_MONTH, 0);
+        editor.putInt("filter_stats_" + Constants.END + "_" + Constants.DATE_DAY, 0);
+
+        editor.apply();
+
+    }
 }

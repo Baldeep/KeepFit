@@ -2,7 +2,9 @@ package cs551.baldeep.keepfit;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +31,7 @@ public class AddGoalPage extends AppCompatActivity {
 
     protected Spinner spinner;
     private Button clearButton;
+    protected Units unitUtils;
 
     private GoalDAO goalDAO;
 
@@ -44,9 +47,10 @@ public class AddGoalPage extends AppCompatActivity {
         } catch (SQLException e) {
             e.printStackTrace();
             Toast.makeText(this, "Failed to initialise db.", Toast.LENGTH_SHORT);
-            /*Thread.UncaughtExceptionHandler ueh = Thread.getDefaultUncaughtExceptionHandler();
-            ueh.uncaughtException(Thread.currentThread(), e);*/
         }
+
+        unitUtils = new Units(getApplicationContext());
+
 
         final EditText goalNameTxt = (EditText) findViewById(R.id.txt_goalname);
         EditText goalValueTxt = (EditText) findViewById(R.id.txt_goalmax);
@@ -54,7 +58,7 @@ public class AddGoalPage extends AppCompatActivity {
 
         spinner = (Spinner) findViewById(R.id.spinner_goalunits);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, Units.getUnitStrings());
+                this, android.R.layout.simple_spinner_item, unitUtils.getUnitStrings());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
@@ -68,6 +72,7 @@ public class AddGoalPage extends AppCompatActivity {
 
         Button addButton = (Button) findViewById(R.id.btn_addgoal);
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         if(getIntent().getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.EDIT)){
             Goal goal = goalDAO.findById(getIntent().getStringExtra(Constants.GOAL_ID));
@@ -78,6 +83,13 @@ public class AddGoalPage extends AppCompatActivity {
             }
             spinner.setSelection(adapter.getPosition(goal.getGoalUnits()));
             addButton.setText("Save");
+        }
+
+        if(sharedPrefs.getBoolean("lock_goals", false)){
+            goalNameTxt.setEnabled(false);
+            clearButton.setEnabled(false);
+            goalValueTxt.setEnabled(false);
+            spinner.setEnabled(false);
         }
 
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +113,7 @@ public class AddGoalPage extends AppCompatActivity {
                     if(goalUnits.equals(Units.STEPS)){
                         goalValue = 10000;
                     } else {
-                        goalValue = Units.getStepsInUnits(goalUnits, 10000);
+                        goalValue = unitUtils.getStepsInUnits(goalUnits, 10000);
                     }
                 } else {
                     goalValue = Double.valueOf(goalValueString);

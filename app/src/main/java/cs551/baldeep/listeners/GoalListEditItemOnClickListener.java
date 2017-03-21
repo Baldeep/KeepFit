@@ -2,10 +2,13 @@ package cs551.baldeep.listeners;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import cs551.baldeep.keepfit.R;
 import cs551.baldeep.utils.Constants;
 import cs551.baldeep.keepfit.AddGoalPage;
 import cs551.baldeep.models.Goal;
@@ -27,6 +30,7 @@ public class GoalListEditItemOnClickListener implements AdapterView.OnItemClickL
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         Goal selected = (Goal) listOfGoals.getItemAtPosition(position);
 
         Intent editGoal = new Intent(parentActivity, AddGoalPage.class);

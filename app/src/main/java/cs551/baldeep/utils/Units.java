@@ -1,7 +1,10 @@
 package cs551.baldeep.utils;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by balde on 12/02/2017.
@@ -17,21 +20,27 @@ public class Units {
 
     public static final String ORIGINAL = "Original";
 
-    public static double STEP_LENGHT_M = 0.7;
+    public double STEP_LENGHT_M;
 
-    public static double getStepsInM(double steps){
+    public Units(Context context){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        STEP_LENGHT_M = (double) sharedPreferences.getFloat(Constants.STRIDE_LENGTH, (float) 0.7);
+    }
+
+    public double getStepsInM(double steps){
         return steps * STEP_LENGHT_M;
     }
 
-    public static double getStepsInKM(double steps){
+    public double getStepsInKM(double steps){
         return (steps * STEP_LENGHT_M)/1000;
     }
 
-    public static double getStepsInMiles(double steps){
+    public double getStepsInMiles(double steps){
         return (steps * STEP_LENGHT_M) * 0.000621371;
     }
 
-    public static double getStepsInYards(double steps){
+    public double getStepsInYards(double steps){
         return (steps * STEP_LENGHT_M) * 1.09361;
     }
 
@@ -45,40 +54,39 @@ public class Units {
         return units;
     }
 
-    public static double getMInSteps(double meters){
+    public double getMInSteps(double meters){
         return meters/STEP_LENGHT_M;
     }
 
-    public static double getKMInSteps(double kms){
+    public double getKMInSteps(double kms){
         return ((kms*1000)/STEP_LENGHT_M);
     }
 
-    public static double getMilesInSteps(double miles){
+    public double getMilesInSteps(double miles){
         return (miles*0.000621371)/STEP_LENGHT_M;
     }
 
-    public static double getYardsInSteps(double yards){
+    public double getYardsInSteps(double yards){
         return (yards*1.09361)/STEP_LENGHT_M;
     }
 
-    public static double getUnitsInSteps(String units, double value){
-        switch(units){
-            case Units.KM:
-                return getKMInSteps(value);
-            case Units.M:
-                return getMInSteps(value);
-            case Units.MILES:
-                return getMilesInSteps(value);
-            case Units.YARDS:
-                return getYardsInSteps(value);
-            case Units.STEPS:
-                return value;
-            default:
-                return 0.0;
+    public final double getUnitsInSteps(String units, double value){
+        if(units.equals(Units.KM)){
+            return getKMInSteps(value);
+        } else if(units.equals(Units.M)){
+            return getMInSteps(value);
+        } else if(units.equals(Units.MILES)){
+            return getMilesInSteps(value);
+        } else if(units.equals(Units.YARDS)){
+            return getYardsInSteps(value);
+        } else if(units.equals(Units.STEPS)) {
+            return value;
+        } else{
+            return 0.0;
         }
     }
 
-    public static double getStepsInUnits(String units, double steps){
+    public final double getStepsInUnits(String units, double steps){
         switch(units){
             case Units.KM:
                 return getStepsInKM(steps);

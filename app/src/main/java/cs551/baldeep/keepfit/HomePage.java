@@ -19,15 +19,20 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eralp.circleprogressview.CircleProgressView;
+
+import org.w3c.dom.Text;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -38,8 +43,10 @@ import java.util.List;
 import cs551.baldeep.adapters.HistoryListAdapter;
 import cs551.baldeep.adapters.GoalListAdapter;
 import cs551.baldeep.listeners.FilterDatePickerListener;
+import cs551.baldeep.listeners.HistoryFilterDateClearButtonListener;
 import cs551.baldeep.listeners.HistoryFilterDatePickerListener;
 import cs551.baldeep.listeners.HistoryFilterModeSpinnerListener;
+import cs551.baldeep.listeners.HistoryFilterUnitsSpinnerListener;
 import cs551.baldeep.utils.Constants;
 import cs551.baldeep.dialogs.PastDatePickerDialog;
 import cs551.baldeep.listeners.CircleProgressOnClickListener;
@@ -97,8 +104,10 @@ public class HomePage extends AppCompatActivity {
         sharedPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if(key.startsWith(Constants.TEST_MODE)){
+                if(key.startsWith(Constants.TEST_MODE)) {
                     checkTestMode();
+                } else if(key.startsWith("filter_stats")){
+                    filterStats();
                 } else if(key.startsWith("filter_")) {
                     filterHistory();
                 }
@@ -149,33 +158,53 @@ public class HomePage extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         historyDateSpinner.setAdapter(adapter);
         historyDateSpinner.setSelection(adapter.getPosition(GoalUtils.HISTORY_ALL));
-        historyDateSpinner.setOnItemSelectedListener(new HistoryFilterModeSpinnerListener(this, sharedPreferences));
+        historyDateSpinner.setOnItemSelectedListener(new HistoryFilterModeSpinnerListener(this, sharedPreferences, Constants.FILTER_HISTORY_MODE));
 
-        final Spinner historyUnitsSpinner = (Spinner) findViewById(R.id.history_units_filter_spinner);
+        Spinner historyUnitsSpinner = (Spinner) findViewById(R.id.history_units_filter_spinner);
         ArrayAdapter<String> unitsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Units.getFilterUnitStrings());
         unitsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         historyUnitsSpinner.setAdapter(unitsAdapter);
-        historyUnitsSpinner.setSelection(unitsAdapter.getPosition(Units.STEPS));
-        historyUnitsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("filter_history_units", parent.getItemAtPosition(position).toString());
-                editor.apply();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                historyUnitsSpinner.setSelection(0);
-            }
-        });
+        historyUnitsSpinner.setSelection(unitsAdapter.getPosition(Units.ORIGINAL));
+        historyUnitsSpinner.setOnItemSelectedListener(new HistoryFilterUnitsSpinnerListener(this, sharedPreferences, Constants.FILTER_HISTORY_MODE));
 
         Button startDateBtn = (Button) findViewById(R.id.btn_history_date_start_filter);
-        startDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.START, today));
+        startDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.FILTER_HISTORY_MODE, Constants.START, today));
+
+        ImageButton startDateClearBtn = (ImageButton) findViewById(R.id.btn_history_date_start_clear);
+        startDateClearBtn.setOnClickListener(new HistoryFilterDateClearButtonListener(sharedPreferences, Constants.FILTER_HISTORY_MODE, Constants.START));
 
         Button endDateBtn = (Button) findViewById(R.id.btn_history_date_end_filter);
-        endDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.END, today));
+        endDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.FILTER_HISTORY_MODE, Constants.END, today));
 
+        ImageButton endDateClearBtn = (ImageButton) findViewById(R.id.btn_history_date_end_clear);
+        endDateClearBtn.setOnClickListener(new HistoryFilterDateClearButtonListener(sharedPreferences, Constants.FILTER_HISTORY_MODE, Constants.END));
+
+        // STATISTICS
+        Spinner statsDateSpinner = (Spinner) findViewById(R.id.stats_date_filter_spinner);
+        ArrayAdapter<String> statsSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, goalUtils.getHistoryFilterStrings());
+        statsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statsDateSpinner.setAdapter(statsSpinnerAdapter);
+        statsDateSpinner.setSelection(statsSpinnerAdapter.getPosition(GoalUtils.HISTORY_ALL));
+        statsDateSpinner.setOnItemSelectedListener(new HistoryFilterModeSpinnerListener(this, sharedPreferences, Constants.FILTER_STATS_MODE));
+
+        Spinner statsUnitsSpinner = (Spinner) findViewById(R.id.stats_units_filter_spinner);
+        ArrayAdapter<String> statsUnitsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, Units.getFilterUnitStrings());
+        statsUnitsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statsUnitsSpinner.setAdapter(statsUnitsAdapter);
+        statsUnitsSpinner.setSelection(statsUnitsAdapter.getPosition(Units.ORIGINAL));
+        statsUnitsSpinner.setOnItemSelectedListener(new HistoryFilterUnitsSpinnerListener(this, sharedPreferences, Constants.FILTER_STATS_MODE));
+
+        Button startStatsDateBtn = (Button) findViewById(R.id.btn_stats_date_start_filter);
+        startStatsDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.FILTER_STATS_MODE, Constants.START, today));
+
+        ImageButton startStatsDateClearBtn = (ImageButton) findViewById(R.id.btn_stats_date_start_clear);
+        startStatsDateClearBtn.setOnClickListener(new HistoryFilterDateClearButtonListener(sharedPreferences, Constants.FILTER_STATS_MODE, Constants.START));
+
+        Button endStatsDateBtn = (Button) findViewById(R.id.btn_stats_date_end_filter);
+        endStatsDateBtn.setOnClickListener(new HistoryFilterDatePickerListener(getFragmentManager(), sharedPreferences, Constants.FILTER_STATS_MODE, Constants.END, today));
+
+        ImageButton endStatsDateClearBtn = (ImageButton) findViewById(R.id.btn_stats_date_end_clear);
+        endStatsDateClearBtn.setOnClickListener(new HistoryFilterDateClearButtonListener(sharedPreferences, Constants.FILTER_STATS_MODE, Constants.END));
 
         // Clicking progressBar
         CircleProgressOnClickListener circleListener = new CircleProgressOnClickListener(getFragmentManager(), goalDAO);
@@ -212,6 +241,8 @@ public class HomePage extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
+        Units units = new Units(getApplicationContext());
+
         if(resultCode == RESULT_ADD_GOAL){
             if(data.getStringExtra(Constants.ADD_GOAL_MODE).equals(Constants.DELETE)){
                 Toast.makeText(this, "DELETE", Toast.LENGTH_SHORT);
@@ -237,8 +268,8 @@ public class HomePage extends AppCompatActivity {
                         currentGoal.setCurrentGoal(false);
 
                         newGoal.setCurrentGoal(true);
-                        double steps = Units.getUnitsInSteps(currentGoal.getGoalUnits(), currentGoal.getGoalCompleted());
-                        newGoal.setGoalCompleted(Units.getStepsInUnits(newGoal.getGoalUnits(), steps));
+                        double steps = units.getUnitsInSteps(currentGoal.getGoalUnits(), currentGoal.getGoalCompleted());
+                        newGoal.setGoalCompleted(units.getStepsInUnits(newGoal.getGoalUnits(), steps));
                         newGoal.setDateOfGoal(today);
                     }
                     goalDAO.saveOrUpdate(currentGoal);
@@ -266,6 +297,12 @@ public class HomePage extends AppCompatActivity {
         checkTestMode();
         updateUI();
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        AppUtils.resetHistoryFilterPreference(sharedPreferences);
+        super.onDestroy();
     }
 
     private void setUpTabs(){
@@ -322,6 +359,7 @@ public class HomePage extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+
         boolean testMode = sharedPreferences.getBoolean(Constants.TEST_MODE, false);
 
         MenuItem testModeTxt = menu.findItem(R.id.menu_test_mode_txt);
@@ -406,7 +444,9 @@ public class HomePage extends AppCompatActivity {
     public void updateUI(){
         Log.i("Home Page", "Updating UI");
         updateHomePage();
-        updateHistoryList();
+        //updateHistoryList();
+        filterHistory();
+        filterStats();
 
         List<Goal> goals = goalDAO.findAll();
         for(Goal g : goals){
@@ -460,6 +500,8 @@ public class HomePage extends AppCompatActivity {
         } else {
             today = new Date(System.currentTimeMillis());
         }
+
+
         if(currentGoal != null) {
             currentGoal.setDateOfGoal(today);
             goalDAO.saveOrUpdate(currentGoal);
@@ -474,7 +516,7 @@ public class HomePage extends AppCompatActivity {
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
-        startFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.START + "_");
+        Date startFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.START + "_");
 
         Button startDateBtn = (Button) findViewById(R.id.btn_history_date_start_filter);
         if(AppUtils.dateIsOutOfBounds(startFilterDate)){
@@ -483,7 +525,7 @@ public class HomePage extends AppCompatActivity {
             startDateBtn.setText(sdf.format(startFilterDate));
         }
 
-        endFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.END + "_");
+        Date endFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.END + "_");
 
         Button endDateBtn = (Button) findViewById(R.id.btn_history_date_end_filter);
         if(AppUtils.dateIsOutOfBounds(endFilterDate)){
@@ -501,5 +543,113 @@ public class HomePage extends AppCompatActivity {
         updateHistoryList();
     }
 
+    public void filterStats(){
+
+        TextView genericText = (TextView) findViewById(R.id.txt_stats_generic);
+
+        String filterMode = sharedPreferences.getString(Constants.FILTER_STATS_MODE, "NONE");
+        String filterUnits = sharedPreferences.getString(Constants.FILTER_STATS_UNITS, "NONE");
+        Date startDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_stats_" + Constants.START + "_");
+        Date endDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_stats_" + Constants.END + "_");
+
+        SimpleDateFormat sdf1 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String startDateString = sdf1.format(startDate);
+        String endDateString = sdf1.format(endDate);
+
+        Button startDateBtn = (Button) findViewById(R.id.btn_history_date_start_filter);
+        if(AppUtils.dateIsOutOfBounds(startDate)){
+            startDateBtn.setText("None Set");
+        } else {
+            startDateBtn.setText(sdf1.format(startDate));
+        }
+
+        Button endDateBtn = (Button) findViewById(R.id.btn_history_date_end_filter);
+        if(AppUtils.dateIsOutOfBounds(endDate)){
+            endDateBtn.setText("None Set");
+        } else {
+            endDateBtn.setText(sdf1.format(endDate));
+        }
+
+        genericText.setText("Mode: " + filterMode + "\n" +
+                            "Units: " + filterUnits + "\n" +
+                            "StartDate: " + startDateString + "\n" +
+                            "EndDateString: " + endDateString + "\n" );
+
+        Goal mostActive = goalUtils.getMaxActivity(filterMode, startDate, endDate, 0, 100);
+        updateMostActive(mostActive, filterUnits);
+
+        Goal leastActive = goalUtils.getMinActivity(filterMode, startDate, endDate, 0, 100);
+        updateLeastActive(leastActive, filterUnits);
+        Log.i("Home Page", "Filtered Stats");
+    }
+
+    private void updateMostActive(Goal mostActive, String filterUnits){
+        if(mostActive != null) {
+            TextView mostActiveName = (TextView) findViewById(R.id.txt_most_active_name);
+            mostActiveName.setText(mostActive.getName());
+
+            TextView mostActiveDate = (TextView) findViewById(R.id.txt_most_active_date);
+            String dateFormat = sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy");
+            SimpleDateFormat sdf;
+            if (dateFormat.startsWith("MM")) {
+                sdf = new SimpleDateFormat("MMM-dd-yy (EEE)");
+            } else {
+                sdf = new SimpleDateFormat("dd-MMM-yy (EEE)");
+            }
+
+            mostActiveDate.setText(sdf.format(mostActive.getDateOfGoal()));
+
+            TextView mostActiveProgress = (TextView) findViewById(R.id.txt_most_active_progress);
+            if (filterUnits.equals(Units.ORIGINAL)) {
+                mostActiveProgress.setText(goalUtils.getFormattedProgressString(mostActive));
+            } else {
+                mostActiveProgress.setText(goalUtils.getFormattedProgressStringInUnits(mostActive, filterUnits));
+            }
+
+            if (mostActive.getPercentageCompleted() >= 100) {
+                ImageView imageView = (ImageView) findViewById(R.id.image_most_active_icon);
+                imageView.setImageResource(R.drawable.btn_star_big_on_pressed);
+            }
+            ProgressBar goalProgress = (ProgressBar) findViewById(R.id.progressBar_most_active);
+            goalProgress.setProgress((int) mostActive.getPercentageCompleted());
+        } else {
+            LinearLayout layout = (LinearLayout) findViewById(R.id.max_goal_layout);
+            layout.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateLeastActive(Goal leastActive, String filterUnits){
+        if(leastActive != null) {
+            TextView leastActiveName = (TextView) findViewById(R.id.txt_least_active_name);
+            leastActiveName.setText(leastActive.getName());
+
+            TextView leastActiveDate = (TextView) findViewById(R.id.txt_least_active_date);
+            String dateFormat = sharedPreferences.getString(Constants.DATE_FORMAT, "dd/MM/yy");
+            SimpleDateFormat sdf;
+            if (dateFormat.startsWith("MM")) {
+                sdf = new SimpleDateFormat("MMM-dd-yy (EEE)");
+            } else {
+                sdf = new SimpleDateFormat("dd-MMM-yy (EEE)");
+            }
+            leastActiveDate.setText(sdf.format(leastActive.getDateOfGoal()));
+
+            TextView leastActiveProgress = (TextView) findViewById(R.id.txt_least_active_progress);
+            if (filterUnits.equals(Units.ORIGINAL)) {
+                leastActiveProgress.setText(goalUtils.getFormattedProgressString(leastActive));
+            } else {
+                leastActiveProgress.setText(goalUtils.getFormattedProgressStringInUnits(leastActive, filterUnits));
+            }
+
+            if (leastActive.getPercentageCompleted() >= 100) {
+                ImageView imageView = (ImageView) findViewById(R.id.image_least_active_icon);
+                imageView.setImageResource(R.drawable.btn_star_big_on_pressed);
+            }
+            ProgressBar goalProgress = (ProgressBar) findViewById(R.id.progressBar_least_active);
+            goalProgress.setProgress((int) leastActive.getPercentageCompleted());
+        }else {
+            LinearLayout layout = (LinearLayout) findViewById(R.id.max_goal_layout);
+            layout.setVisibility(View.GONE);
+        }
+    }
 
 }

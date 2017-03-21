@@ -20,10 +20,12 @@ public class HistoryFilterModeSpinnerListener implements AdapterView.OnItemSelec
 
     private SharedPreferences sharedPreferences;
     private Activity activity;
+    private String filter_x_mode;
 
-    public HistoryFilterModeSpinnerListener(Activity activity, SharedPreferences sharedPreferences){
+    public HistoryFilterModeSpinnerListener(Activity activity, SharedPreferences sharedPreferences, String filter_x_mode){
         this.activity = activity;
         this.sharedPreferences = sharedPreferences;
+        this.filter_x_mode = filter_x_mode;
     }
 
     @Override
@@ -31,10 +33,16 @@ public class HistoryFilterModeSpinnerListener implements AdapterView.OnItemSelec
         String historyFilterDateMode = parent.getItemAtPosition(position).toString();
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Constants.FILTER_HISTORY_MODE, historyFilterDateMode);
+        editor.putString(filter_x_mode, historyFilterDateMode);
         editor.apply();
 
-        LinearLayout customBtns = (LinearLayout) activity.findViewById(R.id.history_custom_filter_layout);
+        LinearLayout customBtns;
+        if(filter_x_mode.equals(Constants.FILTER_HISTORY_MODE)) {
+            customBtns = (LinearLayout) activity.findViewById(R.id.history_custom_filter_layout);
+        } else {
+            customBtns = (LinearLayout) activity.findViewById(R.id.stats_custom_filter_layout);
+        }
+
         if(historyFilterDateMode == GoalUtils.HISTORY_CUSTOM){
             customBtns.setVisibility(View.VISIBLE);
         } else {

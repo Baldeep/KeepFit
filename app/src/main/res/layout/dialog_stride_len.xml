@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:id="@+id/dialog_add_activity_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:inputType="numberDecimal"
+                android:textAlignment="viewEnd"
+                android:layout_marginStart="20dp"
+                android:maxLength="5"
+                android:text="0.7"
+                android:ems="10"
+                android:id="@+id/txt_stride_len" />
+
+            <TextView
+                android:text="Meters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="20dp"
+                android:id="@+id/txt_goalvalue_label"
+                android:textSize="@dimen/text_h1_2"
+                android:textColor="@color/colorPrimaryText"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

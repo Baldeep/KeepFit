@@ -20,13 +20,16 @@ public class HistoryFilterDatePickerListener implements View.OnClickListener {
     private FragmentManager fragmentManager;
     private SharedPreferences sharedPreferences;
     private String startOrEnd;
+    private String historyOrStats;
 
     public HistoryFilterDatePickerListener(FragmentManager fragmentManager,
                                            SharedPreferences sharedPreferences,
+                                           String historyOrStats,
                                            String startOrEnd,
                                            Date today){
         this.fragmentManager = fragmentManager;
         this.sharedPreferences = sharedPreferences;
+        this.historyOrStats = historyOrStats;
         this.startOrEnd = startOrEnd;
         this.today = today;
     }
@@ -35,15 +38,21 @@ public class HistoryFilterDatePickerListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        Date startFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.START + "_");
-        Date endFilterDate = endFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, "filter_" + Constants.END + "_");
+        String prefix = "filter_";
+        if(historyOrStats.equals(Constants.FILTER_STATS_MODE)){
+            prefix += "stats_";
+        }
+
+        Date startFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, prefix + Constants.START + "_");
+        Date endFilterDate = endFilterDate = AppUtils.getSharedPreferecnceDate(sharedPreferences, prefix + Constants.END + "_");
 
 
         PastDatePickerDialog datePicker = new PastDatePickerDialog();
         datePicker.setInitialDate(today);
 
         if(startOrEnd.equals(Constants.START)) {
-            datePicker.setListener(new FilterDatePickerListener(sharedPreferences, Constants.START));
+
+            datePicker.setListener(new FilterDatePickerListener(sharedPreferences, prefix + Constants.START + "_"));
 
             if (!AppUtils.dateIsOutOfBounds(endFilterDate)) {
                 datePicker.setMaxDate(endFilterDate);
@@ -54,7 +63,7 @@ public class HistoryFilterDatePickerListener implements View.OnClickListener {
                 datePicker.setInitialDate(new Date(System.currentTimeMillis()));
             }
         } else {
-            datePicker.setListener(new FilterDatePickerListener(sharedPreferences, Constants.END));
+            datePicker.setListener(new FilterDatePickerListener(sharedPreferences, prefix + Constants.END + "_"));
 
             if(!AppUtils.dateIsOutOfBounds(startFilterDate)){
                 datePicker.setMinDate(startFilterDate);
